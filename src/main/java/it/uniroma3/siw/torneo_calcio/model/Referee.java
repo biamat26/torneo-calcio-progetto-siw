@@ -22,8 +22,8 @@ public class Referee {
     @OneToMany(mappedBy = "referee")
     private List<Match> matches;
 
-    // -------------- GETTER AND SETTER ---------------------
 
+    // -------------- GETTER AND SETTER ---------------------
 
     public Long getId() {
         return id;

@@ -2,8 +2,8 @@ package it.uniroma3.siw.torneo_calcio.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Match {
@@ -22,14 +22,11 @@ public class Match {
 
     private Integer goalsAway;
 
-
     @Enumerated(EnumType.STRING)
-    private MatchState state;
-
+    private MatchStatus state;
 
     @ManyToOne
     private Tournament tournament;
-
 
     @ManyToOne
     private Team homeTeam;
@@ -83,20 +80,12 @@ public class Match {
         this.goalsAway = goalsAway;
     }
 
-    public MatchState getState() {
+    public MatchStatus getState() {
         return state;
     }
 
-    public void setState(MatchState state) {
+    public void setState(MatchStatus state) {
         this.state = state;
-    }
-
-    public Tournament getTournament() {
-        return tournament;
-    }
-
-    public void setTournament(Tournament tournament) {
-        this.tournament = tournament;
     }
 
     public Team getHomeTeam() {
@@ -121,5 +110,13 @@ public class Match {
 
     public void setReferee(Referee referee) {
         this.referee = referee;
+    }
+
+    public Tournament getTournament() {
+        return tournament;
+    }
+
+    public void setTournament(Tournament tournament) {
+        this.tournament = tournament;
     }
 }

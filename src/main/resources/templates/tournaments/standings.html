@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Tournament Standings</title>
+</head>
+<body>
+
+<h1>Standings</h1>
+
+<div th:if="${tournament}">
+    <h2>
+        <span th:text="${tournament.name}">Tournament: </span>
+        <span th:text="${tournament.year}">2026</span>
+    </h2>
+
+    <div th:if="${standings.isEmpty()}">
+        No matches played yet.
+    </div>
+
+    <table th:unless="${standings.isEmpty()}">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Team</th>
+            <th>P</th>
+            <th>W</th>
+            <th>D</th>
+            <th>L</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>GD</th>
+            <th>Pts</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="row, iter : ${standings}">
+            <td th:text="${iter.count}">1</td>
+            <td th:text="${row.team.name}">Team name</td>
+            <td th:text="${row.played}">0</td>
+            <td th:text="${row.wins}">0</td>
+            <td th:text="${row.draws}">0</td>
+            <td th:text="${row.losses}">0</td>
+            <td th:text="${row.goalsFor}">0</td>
+            <td th:text="${row.goalsAgainst}">0</td>
+            <td th:text="${row.goalDifference}">0</td>
+            <td th:text="${row.points}">0</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a th:href="@{/tournaments/{id}(id=${tournament.id})}">← Back to tournament</a>
+</div>
+
+<div th:unless="${tournament}">
+    Tournament not found.
+</div>
+
+</body>
+</html>

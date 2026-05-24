@@ -1,19 +1,68 @@
 <!DOCTYPE html>
-
 <html lang="en">
+<head>
+    <title>Tournament Details</title>
+</head>
+<body>
 
-    <head >
-        <title>
-            Tournament
-        </title>
-    </head>
+<div th:if="${tournament}">
 
-    <body>
-        <h1>Tournament details:</h1>
-        <div th:if="${movie}">
-            <span th:text="${tournament.name}">Up!</span>
-            <span th:text="${tournament.year}">2000</span>
-        </div>
-        <div th:unless="${movie}"></div>
-    </body>
+    <h1 th:text="${tournament.name}">Tournament name</h1>
+
+    <p>
+        <strong>Year:</strong>
+        <span th:text="${tournament.year}">2025</span>
+    </p>
+
+    <p th:if="${tournament.description}">
+        <strong>Description:</strong>
+        <span th:text="${tournament.description}">Description here</span>
+    </p>
+
+    <h2>Participating Teams</h2>
+    <div th:if="${tournament.teams == null or tournament.teams.isEmpty()}">
+        No teams registered yet.
+    </div>
+    <ul th:unless="${tournament.teams == null or tournament.teams.isEmpty()}">
+        <li th:each="team : ${tournament.teams}">
+            <a th:href="@{/teams/{id}(id=${team.id})}" th:text="${team.name}">Team name</a>
+        </li>
+    </ul>
+
+    <h2>Matches</h2>
+    <div th:if="${tournament.matches == null or tournament.matches.isEmpty()}">
+        No matches scheduled yet.
+    </div>
+    <ul th:unless="${tournament.matches == null or tournament.matches.isEmpty()}">
+        <li th:each="match : ${tournament.matches}">
+            <span th:text="${match.homeTeam.name}">Home</span>
+            vs
+            <span th:text="${match.awayTeam.name}">Away</span>
+            —
+            <span th:if="${match.state.name() == 'PLAYED'}">
+                <strong th:text="${match.goalsHome + ' - ' + match.goalsAway}">3 - 1</strong>
+            </span>
+            <span th:if="${match.state.name() == 'SCHEDULED'}"
+                  th:text="${#temporals.format(match.date_and_hour, 'dd/MM/yyyy HH:mm')}">
+                date
+            </span>
+        </li>
+    </ul>
+
+    <hr>
+
+    <p>
+        <a th:href="@{/tournaments/{id}/standings(id=${tournament.id})}">View Standings →</a>
+    </p>
+    <p>
+        <a th:href="@{/tournaments}">← Back to all tournaments</a>
+    </p>
+
+</div>
+
+<div th:unless="${tournament}">
+    Tournament not found.
+</div>
+
+</body>
 </html>
