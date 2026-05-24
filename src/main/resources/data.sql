@@ -1,0 +1,3 @@
+INSERT INTO tournament (id, name, year, description) VALUES (nextval('tournament_seq'), 'Serie A Amatoriale 2025', 2025, 'Torneo amatoriale stagione 2025');
+INSERT INTO tournament (id, name, year, description) VALUES (nextval('tournament_seq'), 'Coppa Primavera', 2025, 'Torneo primaverile a eliminazione diretta');
+INSERT INTO tournament (id, name, year, description) VALUES (nextval('tournament_seq'), 'Torneo Estivo Roma', 2024, 'Torneo estivo della città di Roma');

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head >
+        <title>
+            Tournament
+        </title>
+    </head>
+
+    <body>
+        <h1>Tournament details:</h1>
+        <div th:if="${movie}">
+            <span th:text="${tournament.name}">Up!</span>
+            <span th:text="${tournament.year}">2000</span>
+        </div>
+        <div th:unless="${movie}"></div>
+    </body>
+</html>
