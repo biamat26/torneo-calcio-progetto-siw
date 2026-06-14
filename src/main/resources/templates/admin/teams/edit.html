@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="">
+    <head>
+        <title>Edit Teams</title>
+    </head>
+
+    <body>
+    <header>
+        <nav>
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tornei</a>
+            <a th:href="@{/teams}">Squadre</a>
+            <a th:href="@{/matches}">Partite</a>
+            <span th:if="${userDetails}">
+                    <span th:text="${userDetails.username}"></span>
+                    <span sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/index}">Admin Dashboard</a>
+                    </span>
+                    <form th:action="@{/logout}" method = "POST">
+                        <button type="submit">Logout</button>
+                    </form>
+                </span>
+            <span th:unless="${userDetails}">
+                    <a th:href="@{/login}">Login</a>
+                    <a th:href="@{/register}">Registrati</a>
+                </span>
+        </nav>
+    </header>
+
+        <h1>Modifica squadra</h1>
+
+    <form th:action="@{/admin/teams/{id}(id=${team.id})}" method="POST" th:object="${team}">
+        <div>
+            Nome: <input type="text" th:field="*{name}"/>
+        </div>
+        <div>
+            Anno fondazione: <input type="text" th:field="*{foundationYear}"/>
+        </div>
+        <div>
+            Città: <input type="text" th:field="*{city}"/>
+        </div>
+        <button type="submit" name="action" value="save">Conferma</button>
+    </form>
+    </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

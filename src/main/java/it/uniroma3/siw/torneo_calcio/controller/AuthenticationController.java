@@ -3,6 +3,9 @@ package it.uniroma3.siw.torneo_calcio.controller;
 import it.uniroma3.siw.torneo_calcio.model.Credentials;
 import it.uniroma3.siw.torneo_calcio.model.User;
 import it.uniroma3.siw.torneo_calcio.service.CredentialsService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 @Controller
 public class AuthenticationController {
@@ -46,7 +51,16 @@ public class AuthenticationController {
         if(!userBindingResult.hasErrors() && !credentialsBindingResult.hasErrors()) {
             credentials.setUser(user);
             Credentials credentialsSaved = credentialsService.saveCredentials(credentials);
-            return "redirect:/login";
+            // auto-login
+            UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(
+                            credentialsSaved.getUsername(),
+                            null,
+                            List.of(new SimpleGrantedAuthority(credentialsSaved.getRole()))
+                    );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            return "redirect:/";
         }
         return "authentication/registerUser";
     }

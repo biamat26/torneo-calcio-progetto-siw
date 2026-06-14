@@ -29,25 +29,18 @@
     </nav>
 
     <h1>Crea Nuova Squadra</h1>
-    <span th:action="@{/admin/teams}" th:object="${team}">
+    <form th:action="@{/admin/teams}" method="POST" th:object="${team}">
         <div>
-            Nome: <span><input type="text" th:field="*{name}"/></span>
+            Nome: <input type="text" th:field="*{name}"/>
             <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
         </div>
-
         <div>
-            Anno fondazione: <span><input type="text" th:field="*{foundation_year}"/></span>
-            <span th:if="${#fields.hasErrors('foundation_year')}" th:errors="*{foundation_year}"></span>
+            Anno fondazione: <input type="text" th:field="*{foundationYear}"/>
         </div>
-
         <div>
-            Città: <span><input type="text" th:field="*{city}"/></span>
-            <span th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
+            Città: <input type="text" th:field="*{city}"/>
         </div>
-
-        <div>
-            <span><button type="submit" name="action" value="save">Conferma</button></span>
-        </div>
-    </span>
+        <button type="submit" name="action" value="save">Conferma</button>
+    </form>
     </body>
 </html>

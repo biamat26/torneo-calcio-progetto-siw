@@ -52,7 +52,7 @@ public class SecurityConfiguration {
 
         httpSecurity.formLogin(form -> {
             form.loginPage("/login").permitAll();
-            form.defaultSuccessUrl("/", true);
+            form.defaultSuccessUrl("/", false);
             form.failureUrl("/login?error=true");
         });
 

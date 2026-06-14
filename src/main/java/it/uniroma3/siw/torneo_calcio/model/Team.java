@@ -14,7 +14,7 @@ public class Team {
     @Column(nullable = false)
     private String name;
 
-    private Long foundation_year;
+    private Long foundationYear;
 
     private String city;
 
@@ -67,12 +67,12 @@ public class Team {
         this.name = name;
     }
 
-    public Long getFoundation_year() {
-        return foundation_year;
+    public Long getFoundationYear() {
+        return foundationYear;
     }
 
-    public void setFoundation_year(Long foundation_year) {
-        this.foundation_year = foundation_year;
+    public void setFoundationYear(Long foundationYear) {
+        this.foundationYear = foundationYear;
     }
 
     public String getCity() {

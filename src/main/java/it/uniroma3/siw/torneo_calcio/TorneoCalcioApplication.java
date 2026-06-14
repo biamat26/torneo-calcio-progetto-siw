@@ -13,6 +13,3 @@ public class TorneoCalcioApplication {
 		SpringApplication.run(TorneoCalcioApplication.class, args);
 	}
 }
-
-
-
