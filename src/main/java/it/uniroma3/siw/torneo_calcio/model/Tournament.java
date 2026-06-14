@@ -3,6 +3,7 @@ package it.uniroma3.siw.torneo_calcio.model;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Tournament {
@@ -22,8 +23,24 @@ public class Tournament {
     @ManyToMany
     private List<Team> teams;
 
-    @OneToMany(mappedBy = "tournament")
+    @OneToMany(mappedBy = "tournament", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<Match> matches;
+
+
+
+    // ------------- EQUALS AND HASHCODE -------------
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Tournament that = (Tournament) o;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
 
 
     // -------------- GETTER AND SETTER ---------------------

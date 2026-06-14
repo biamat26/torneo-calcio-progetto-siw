@@ -1,13 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Football Tournaments - Home Page</title>
-</head>
 
-<body>
-<div>
-    <a href="/tournaments">Tournaments</a>
-</div>
-</body>
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <title>Tornei di Calcio SIW</title>
+    </head>
+
+    <body>
+        <header>
+
+
+            <nav>
+                <a th:href="@{/}">Home</a>
+                <a th:href="@{/tournaments}">Tornei</a>
+                <a th:href="@{/teams}">Squadre</a>
+                <a th:href="@{/matches}">Partite</a>
+                <span th:if="${userDetails}">
+                    <span th:text="${userDetails.username}"></span>
+                    <span sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/index}">Admin Dashboard</a>
+                    </span>
+                    <form th:action="@{/logout}" method = "POST">
+                        <button type="submit">Logout</button>
+                    </form>
+                </span>
+                <span th:unless="${userDetails}">
+                    <a th:href="@{/login}">Login</a>
+                    <a th:href="@{/register}">Registrati</a>
+                </span>
+            </nav>
+        </header>
+
+
+        <div>
+            <h1>Tornei SIW Roma3</h1>
+            <p>Benvenuti alla nostra piattaforma per l'organizzazione di tornei di calcio!</p>
+            <a th:href="@{/tournaments}">[ Visualizza Tornei ]</a>
+        </div>
+
+
+        <div>
+            <h2>Scopri con noi le prossime partite</h2>
+            <ul>
+                <li th:each="match : ${upcomingMatches}">
+                    <span th:text="${match.dateTime}"></span>
+                    <span th:text="${match.tournament.name}"></span>
+                    <span th:text="${match.homeTeam.name}"></span>
+                    -
+                    <span th:text="${match.awayTeam.name}"></span>
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <h2>Scopri gli ultimi risultati</h2>
+            <ul>
+                <li th:each="match : ${lastResults}">
+                    <span th:text="${match.homeTeam.name}"></span>
+                    <span th:text="${match.goalsHome}"></span>
+                    -
+                    <span th:text="${match.goalsAway}"></span>
+                    <span th:text="${match.awayTeam.name}"></span>
+                </li>
+            </ul>
+        </div>
+    </body>
 </html>
-```

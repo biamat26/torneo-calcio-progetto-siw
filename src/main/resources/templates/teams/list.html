@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Squadre</title>
+</head>
+
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/matches}">Partite</a>
+    <span th:if="${userDetails}">
+                    <span th:text="${userDetails.username}"></span>
+                    <span sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/index}">Admin Dashboard</a>
+                    </span>
+                    <form th:action="@{/logout}" method = "POST">
+                        <button type="submit">Logout</button>
+                    </form>
+                </span>
+    <span th:unless="${userDetails}">
+                    <a th:href="@{/login}">Login</a>
+                    <a th:href="@{/register}">Registrati</a>
+                </span>
+</nav>
+
+<h1>Squadre</h1>
+
+<ul>
+    <li th:each="team : ${teams}">
+        <a th:href="@{/teams/{id}(id=${team.id})}" th:text="${team.name}"></a>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/teams/{id}/edit(id=${team.id})}">Modifica</a>
+            <form th:action="@{/admin/teams/{id}/delete(id=${team.id})}" method="POST">
+                <button type="submit">Cancella</button>
+            </form>
+        </span>
+    </li>
+</ul>
+
+<span th:if="${userDetails}">
+                <span sec:authorize="hasAuthority('ADMIN')">
+                     <a th:href="@{/admin/teams/new}">Aggiungi Nuova Squadra</a>
+                </span>
+    </span>
+</body>
+
+</html>

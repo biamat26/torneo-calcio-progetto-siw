@@ -1,20 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Tournaments</title>
+    <title>Tornei</title>
 </head>
 
-    <body>
-        <h1>Tournaments</h1>
-        <ul>
-            <li th:each="tournament : ${tournaments}">
-                <a th:href="@{/tournaments/{id}(id=${tournament.id})}"
-                th:text="${tournament.name}">name</a>
-            </li>
-        </ul>
+<body>
+<header>
 
-        <div>
-            <a href="/">Back to home</a>
-        </div>
-    </body>
+
+    <nav>
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/tournaments}">Tornei</a>
+        <a th:href="@{/teams}">Squadre</a>
+        <a th:href="@{/matches}">Partite</a>
+        <span th:if="${userDetails}">
+                    <span th:text="${userDetails.username}"></span>
+                    <span sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/index}">Admin Dashboard</a>
+                    </span>
+                    <form th:action="@{/logout}" method = "POST">
+                        <button type="submit">Logout</button>
+                    </form>
+                </span>
+        <span th:unless="${userDetails}">
+                    <a th:href="@{/login}">Login</a>
+                    <a th:href="@{/register}">Registrati</a>
+                </span>
+    </nav>
+</header>
+
+
+
+<div>
+    <h1>Tornei del momento</h1>
+    <ul>
+        <li th:each="tournament : ${tournaments}">
+            <a th:href="@{/tournaments/{id}(id=${tournament.id})}" th:text="${tournament.name}"></a>
+            <span th:text="${tournament.year}"></span>
+            <span th:text="${tournament.teams.size()}"></span>
+            <span sec:authorize="hasAuthority('ADMIN')"><a th:href="@{/admin/tournaments/{id}/edit(id=${tournament.id})}">
+                Modifica torneo</a>
+            </span>
+            <form th:action="@{/admin/tournaments/{id}/delete(id=${tournament.id})}" method="POST">
+                <button type="submit">Cancella</button>
+            </form>
+        </li>
+    </ul>
+
+    <span th:if="${userDetails}">
+                <span sec:authorize="hasAuthority('ADMIN')">
+                     <a th:href="@{/admin/tournaments/new}">Aggiungi Nuovo Torneo</a>
+                </span>
+    </span>
+</div>
+
+</body>
 </html>

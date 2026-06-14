@@ -8,6 +8,7 @@ import it.uniroma3.siw.torneo_calcio.standings.StandingRow;
 import it.uniroma3.siw.torneo_calcio.model.Tournament;
 import it.uniroma3.siw.torneo_calcio.repository.TournamentRepository;
 import it.uniroma3.siw.torneo_calcio.standings.StandingRowComparator;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,41 +24,56 @@ public class TournamentService {
         this.matchRepository = matchRepository;
     }
 
+    @Transactional(readOnly  = true)
     public Optional<Tournament> findById(Long id){
         return this.tournamentRepository.findById(id);
     }
 
+    @Transactional(readOnly  = true)
     public List<Tournament> findAll(){
         return this.tournamentRepository.findAll();
     }
 
 
+    @Transactional(readOnly = true)
     public List<StandingRow> getStandings(Long tournamentId){
-
         List<Match> matches = matchRepository.findByTournament_IdAndState(tournamentId, MatchStatus.PLAYED);
-
         Map<Team, StandingRow> table = new HashMap<>();
-
         for(Match match : matches){
             Team homeTeam = match.getHomeTeam();
             Team awayTeam = match.getAwayTeam();
-
-            if(!table.containsKey(homeTeam)){
-                table.put(homeTeam, new StandingRow(homeTeam));
-            }
-
-            if(!table.containsKey(awayTeam)){
-                table.put(awayTeam, new StandingRow(awayTeam));
-            }
-
+            if(!table.containsKey(homeTeam)){ table.put(homeTeam, new StandingRow(homeTeam)); }
+            if(!table.containsKey(awayTeam)){ table.put(awayTeam, new StandingRow(awayTeam)); }
             table.get(homeTeam).addMatch(match.getGoalsHome(), match.getGoalsAway());
             table.get(awayTeam).addMatch(match.getGoalsAway(), match.getGoalsHome());
         }
-
         List<StandingRow> standings = new ArrayList<StandingRow>(table.values());
-
         standings.sort(new StandingRowComparator());
-
         return standings;
     }
+
+    @Transactional(readOnly = true)
+    public List<Match> getFixtures(Long tournamentId){
+        return matchRepository.findByTournament_IdAndState(tournamentId, MatchStatus.SCHEDULED);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Match> getResults(Long tournamentId){
+        return matchRepository.findByTournament_IdAndState(tournamentId, MatchStatus.PLAYED);
+    }
+
+    @Transactional
+    public Tournament save(Tournament tournament) {
+        return tournamentRepository.save(tournament);
+    }
+
+    @Transactional
+    public void delete(Long id){
+        Optional<Tournament> tournament = tournamentRepository.findById(id);
+        tournament.ifPresent(tournamentRepository::delete);
+
+    }
+
 }
+
+

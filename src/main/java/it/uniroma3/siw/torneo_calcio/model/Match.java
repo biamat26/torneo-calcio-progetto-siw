@@ -3,7 +3,7 @@ package it.uniroma3.siw.torneo_calcio.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Match {
@@ -13,7 +13,7 @@ public class Match {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime date_and_hour;
+    private LocalDateTime dateTime;
 
     @Column(nullable = false)
     private String local;
@@ -38,6 +38,21 @@ public class Match {
     private Referee referee;
 
 
+    // ------------- EQUALS AND HASHCODE -------------
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Match match = (Match) o;
+        return Objects.equals(getId(), match.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
+
+
     // -------------- GETTER AND SETTER ---------------------
 
     public Long getId() {
@@ -48,12 +63,12 @@ public class Match {
         this.id = id;
     }
 
-    public LocalDateTime getDate_and_hour() {
-        return date_and_hour;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setDate_and_hour(LocalDateTime date_and_hour) {
-        this.date_and_hour = date_and_hour;
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public String getLocal() {

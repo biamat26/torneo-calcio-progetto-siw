@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 
-<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
-    <head>
-        <title>
-            Torneo
-        </title>
-    </head>
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Squadra</title>
+</head>
 
     <body>
-
-    <header>
     <nav>
         <a th:href="@{/}">Home</a>
         <a th:href="@{/tournaments}">Tornei</a>
@@ -29,24 +25,16 @@
                     <a th:href="@{/register}">Registrati</a>
                 </span>
     </nav>
-    </header>
+    <h1 th:text="${team.name}"></h1>
+    <p th:text="'Anno fondazione: ' + ${team.foundation_year}"></p>
+    <p th:text="'Città: ' + ${team.city}"></p>
 
-        <h1 th:text="${tournament.name}"></h1>
-
-        <h2>Dettagli torneo:</h2>
-        <span th:text="'Anno: ' + ${tournament.year}"></span>
-        <span th:text="'Descrizione: ' + ${tournament.description}"></span>
-
-        <a th:href="@{/tournaments/{id}/standings(id=${tournament.id})}">Classifica</a>
-        <a th:href="@{/tournaments/{id}/fixtures(id=${tournament.id})}">Calendario</a>
-
-        <span th:each="teams : ${tournament.teams}">
-            <a th:href="@{/teams/{id}(id=${teams.id})}" th:text="${teams.name}"></a>
-        </span>
-
-
-
-
+    <h2>Giocatori</h2>
+    <ul>
+        <li th:each="player : ${team.players}"
+            th:text="${player.name} + ' ' + ${player.surname} + ' - ' + ${player.role}">
+        </li>
+    </ul>
 
     </body>
 </html>

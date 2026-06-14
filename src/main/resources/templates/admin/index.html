@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        SiwMovie - Amministrazione
+    </title>
+</head>
+<body>
+<h1>Gestione</h1>
+<h2>(riservato agli amministratori)</h2>
+<div>
+    <a href="/admin/tournament/new">Add new tournament</a>
+</div>
+<div>
+    <form th:action="@{/logout}" method="POST">
+        <button type="submit">Logout</button>
+    </form>
+</div>
+</body>
+</html>

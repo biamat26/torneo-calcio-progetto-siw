@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+  <head>
+    <title>
+      Torneo Calcio - Login
+    </title>
+
+  </head>
+
+  <body>
+
+
+  <nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/matches}">Partite</a>
+    <span th:if="${userDetails}">
+                    <span th:text="${userDetails.username}"></span>
+                    <span sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/index}">Admin Dashboard</a>
+                    </span>
+                    <form th:action="@{/logout}" method = "POST">
+                        <button type="submit">Logout</button>
+                    </form>
+                </span>
+    <span th:unless="${userDetails}">
+                    <a th:href="@{/login}">Login</a>
+                    <a th:href="@{/register}">Registrati</a>
+                </span>
+  </nav>
+  </header>
+
+    <h1>Login</h1>
+    <form th:action="@{/login}" method = "POST">
+      <div>
+        <span>Username</span>
+        <span><input name ="username" type = "text" required/></span>
+      </div>
+
+      <div>
+        <span>Password</span>
+        <span><input name ="password" type="password" required/></span>
+      </div>
+
+      <div>
+        <span th:if="${param.error != null}">Username o password errati</span>
+      </div>
+      <div>
+        <span><button type="submit">Login</button></span>
+      </div>
+    </form>
+
+  <div>
+    <a th:href="@{/register}">Registrati</a>
+  </div>
+
+  </body>
+
+</html>

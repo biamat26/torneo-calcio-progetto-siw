@@ -3,6 +3,7 @@ package it.uniroma3.siw.torneo_calcio.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 public class Player {
@@ -12,10 +13,10 @@ public class Player {
     private Long id;
 
     @Column(nullable = false)
-    private String first_name;
+    private String name;
 
     @Column(nullable = false)
-    private String last_name;
+    private String surname;
 
     private LocalDate birth_date;
 
@@ -27,8 +28,23 @@ public class Player {
     @ManyToOne
     private Team team;
 
-    // -------------- GETTER AND SETTER ---------------------
 
+    // ------------- EQUALS AND HASHCODE -------------
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return Objects.equals(getId(), player.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
+
+
+    // -------------- GETTER AND SETTER ---------------------
 
     public Long getId() {
         return id;
@@ -38,20 +54,20 @@ public class Player {
         this.id = id;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getName() {
+        return name;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public LocalDate getBirth_date() {

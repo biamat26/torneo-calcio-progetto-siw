@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+    <head>
+        <title>Inserimento Torneo</title>
+    </head>
+
+    <body>
+    <nav>
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/tournaments}">Tornei</a>
+        <a th:href="@{/teams}">Squadre</a>
+        <a th:href="@{/matches}">Partite</a>
+        <span th:if="${userDetails}">
+                    <span th:text="${userDetails.username}"></span>
+                    <span sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/index}">Admin Dashboard</a>
+                    </span>
+                    <form th:action="@{/logout}" method = "POST">
+                        <button type="submit">Logout</button>
+                    </form>
+                </span>
+        <span th:unless="${userDetails}">
+                    <a th:href="@{/login}">Login</a>
+                    <a th:href="@{/register}">Registrati</a>
+                </span>
+    </nav>
+    </header>
+
+        <h1>Aggiungi un torneo</h1>
+        <form th:action="@{/admin/tournaments}" method="POST" th:object="${tournament}">
+            <div th:if="${#fields.hasGlobalErrors()}">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">...</p>
+            </div>
+            <div>
+                Nome: <span><input type="text" th:field="*{name}"/></span>
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+            </div>
+
+            <div>
+                Anno: <span><input type="text" th:field="*{year}"/></span>
+                <span th:if="${#fields.hasErrors('year')}" th:errors="*{year}"></span>
+            </div>
+            <div>
+                Descrizione: <span><input type="text" th:field="*{description}"/></span>
+                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+            </div>
+            <div>
+                <span><button type="submit" name="action" value="save">Conferma</button></span>
+            </div>
+        </form>
+    </body>
+</html>

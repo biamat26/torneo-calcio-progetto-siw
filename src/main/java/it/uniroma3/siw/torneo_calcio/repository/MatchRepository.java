@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface MatchRepository extends JpaRepository<Match, Long> {
     List<Match> findByTournament_IdAndState(Long tournamentId, MatchStatus state);
+    List<Match> findTop5ByStateOrderByDateTimeDesc(MatchStatus state);
+    List<Match> findTop5ByStateOrderByDateTimeAsc(MatchStatus state);
 }

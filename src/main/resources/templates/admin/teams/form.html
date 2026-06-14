@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 
-<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <head>
         <title>
-            Torneo
+
         </title>
     </head>
 
     <body>
-
-    <header>
     <nav>
         <a th:href="@{/}">Home</a>
         <a th:href="@{/tournaments}">Tornei</a>
@@ -29,24 +27,27 @@
                     <a th:href="@{/register}">Registrati</a>
                 </span>
     </nav>
-    </header>
 
-        <h1 th:text="${tournament.name}"></h1>
+    <h1>Crea Nuova Squadra</h1>
+    <span th:action="@{/admin/teams}" th:object="${team}">
+        <div>
+            Nome: <span><input type="text" th:field="*{name}"/></span>
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        </div>
 
-        <h2>Dettagli torneo:</h2>
-        <span th:text="'Anno: ' + ${tournament.year}"></span>
-        <span th:text="'Descrizione: ' + ${tournament.description}"></span>
+        <div>
+            Anno fondazione: <span><input type="text" th:field="*{foundation_year}"/></span>
+            <span th:if="${#fields.hasErrors('foundation_year')}" th:errors="*{foundation_year}"></span>
+        </div>
 
-        <a th:href="@{/tournaments/{id}/standings(id=${tournament.id})}">Classifica</a>
-        <a th:href="@{/tournaments/{id}/fixtures(id=${tournament.id})}">Calendario</a>
+        <div>
+            Città: <span><input type="text" th:field="*{city}"/></span>
+            <span th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
+        </div>
 
-        <span th:each="teams : ${tournament.teams}">
-            <a th:href="@{/teams/{id}(id=${teams.id})}" th:text="${teams.name}"></a>
-        </span>
-
-
-
-
-
+        <div>
+            <span><button type="submit" name="action" value="save">Conferma</button></span>
+        </div>
+    </span>
     </body>
 </html>

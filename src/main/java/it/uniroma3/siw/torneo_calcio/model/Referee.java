@@ -3,6 +3,7 @@ package it.uniroma3.siw.torneo_calcio.model;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Referee {
@@ -11,16 +12,31 @@ public class Referee {
     private Long id;
 
     @Column(nullable = false)
-    private String first_name;
+    private String name;
 
     @Column(nullable = false)
-    private String last_name;
+    private String surname;
 
     @Column(nullable = false, unique = true)
     private String referee_code;
 
     @OneToMany(mappedBy = "referee")
     private List<Match> matches;
+
+
+    // ------------- EQUALS AND HASHCODE -------------
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Referee referee = (Referee) o;
+        return Objects.equals(getId(), referee.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
 
 
     // -------------- GETTER AND SETTER ---------------------
@@ -33,20 +49,20 @@ public class Referee {
         this.id = id;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getName() {
+        return name;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public String getReferee_code() {

@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <head>
-        <title>
-            Torneo
-        </title>
+        <title>Calendario Torneo</title>
     </head>
-
     <body>
-
-    <header>
     <nav>
         <a th:href="@{/}">Home</a>
         <a th:href="@{/tournaments}">Tornei</a>
@@ -29,23 +24,13 @@
                     <a th:href="@{/register}">Registrati</a>
                 </span>
     </nav>
-    </header>
 
-        <h1 th:text="${tournament.name}"></h1>
-
-        <h2>Dettagli torneo:</h2>
-        <span th:text="'Anno: ' + ${tournament.year}"></span>
-        <span th:text="'Descrizione: ' + ${tournament.description}"></span>
-
-        <a th:href="@{/tournaments/{id}/standings(id=${tournament.id})}">Classifica</a>
-        <a th:href="@{/tournaments/{id}/fixtures(id=${tournament.id})}">Calendario</a>
-
-        <span th:each="teams : ${tournament.teams}">
-            <a th:href="@{/teams/{id}(id=${teams.id})}" th:text="${teams.name}"></a>
-        </span>
-
-
-
+    <h1 th:text="'Calendario ' + ${tournament.name}"></h1>
+    <ol>
+        <li th:each="match : ${fixtures}">
+            <span th:text="${match.homeTeam.name} + ' vs ' + ${match.awayTeam.name} + ' - ' + ${match.dateTime}"></span>
+    </li>
+    </ol>
 
 
     </body>

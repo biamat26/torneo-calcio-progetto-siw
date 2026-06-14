@@ -1,59 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Tournament Standings</title>
+    <title>Classifica</title>
 </head>
 <body>
+<nav>
+    <nav>
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/tournaments}">Tornei</a>
+        <a th:href="@{/teams}">Squadre</a>
+        <a th:href="@{/matches}">Partite</a>
+        <span th:if="${userDetails}">
+                    <span th:text="${userDetails.username}"></span>
+                    <span sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/index}">Admin Dashboard</a>
+                    </span>
+                    <form th:action="@{/logout}" method = "POST">
+                        <button type="submit">Logout</button>
+                    </form>
+                </span>
+        <span th:unless="${userDetails}">
+                    <a th:href="@{/login}">Login</a>
+                    <a th:href="@{/register}">Registrati</a>
+                </span>
+    </nav>
+</nav>
 
-<h1>Standings</h1>
+<h1 th:text="'Classifica ' + ${tournament.name}"></h1>
 
-<div th:if="${tournament}">
-    <h2>
-        <span th:text="${tournament.name}">Tournament: </span>
-        <span th:text="${tournament.year}">2026</span>
-    </h2>
-
-    <div th:if="${standings.isEmpty()}">
-        No matches played yet.
-    </div>
-
-    <table th:unless="${standings.isEmpty()}">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Team</th>
-            <th>P</th>
-            <th>W</th>
-            <th>D</th>
-            <th>L</th>
-            <th>GF</th>
-            <th>GA</th>
-            <th>GD</th>
-            <th>Pts</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="row, iter : ${standings}">
-            <td th:text="${iter.count}">1</td>
-            <td th:text="${row.team.name}">Team name</td>
-            <td th:text="${row.played}">0</td>
-            <td th:text="${row.wins}">0</td>
-            <td th:text="${row.draws}">0</td>
-            <td th:text="${row.losses}">0</td>
-            <td th:text="${row.goalsFor}">0</td>
-            <td th:text="${row.goalsAgainst}">0</td>
-            <td th:text="${row.goalDifference}">0</td>
-            <td th:text="${row.points}">0</td>
-        </tr>
-        </tbody>
-    </table>
-
-    <a th:href="@{/tournaments/{id}(id=${tournament.id})}">← Back to tournament</a>
-</div>
-
-<div th:unless="${tournament}">
-    Tournament not found.
-</div>
-
+<table>
+    <thead>
+    <tr>
+        <th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="row, iter : ${standings}"
+        th:classappend="${iter.count == 1 ? 'rank-gold' : (iter.count == 2 ? 'rank-silver' : (iter.count == 3 ? 'rank-bronze' : ''))}">
+        <td th:text="${iter.count}"></td>
+        <td th:text="${row.team.name}"></td>
+        <td th:text="${row.played}"></td>
+        <td th:text="${row.wins}"></td>
+        <td th:text="${row.draws}"></td>
+        <td th:text="${row.losses}"></td>
+        <td th:text="${row.goalsFor}"></td>
+        <td th:text="${row.goalsAgainst}"></td>
+        <td th:text="${row.goalDifference}"></td>
+        <td th:text="${row.points}"></td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>
