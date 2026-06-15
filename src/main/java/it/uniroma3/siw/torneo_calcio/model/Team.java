@@ -24,9 +24,6 @@ public class Team {
     @OneToMany(mappedBy = "team", fetch = FetchType.EAGER)
     private List<Player> players;
 
-    @ManyToOne
-    private Tournament tournament;
-
     @OneToMany(mappedBy = "homeTeam")
     private List<Match> homeMatches;
 
@@ -97,14 +94,6 @@ public class Team {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
-    }
-
-    public Tournament getTournament() {
-        return tournament;
-    }
-
-    public void setTournament(Tournament tournament) {
-        this.tournament = tournament;
     }
 
     public List<Match> getHomeMatches() {

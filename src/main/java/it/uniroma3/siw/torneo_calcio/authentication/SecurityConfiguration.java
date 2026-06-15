@@ -43,8 +43,11 @@ public class SecurityConfiguration {
         httpSecurity.authorizeHttpRequests(authorize -> {
             authorize.requestMatchers(
                     "/", "/index", "/register",
-                    "/teams", "/teams/**", "/css/**",
-                    "/images/**", "/favicon.ico"
+                    "/teams", "/teams/**",
+                    "/tournaments", "/tournaments/**",
+                    "/matches", "/matches/**",
+                    "/players", "/players/**",
+                    "/css/**", "/images/**", "/favicon.ico"
             ).permitAll();
             authorize.requestMatchers("/admin/**").hasAnyAuthority("ADMIN");
             authorize.anyRequest().authenticated();

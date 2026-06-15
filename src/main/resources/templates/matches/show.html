@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Partita</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <span th:if="${userDetails}">
+        <span th:text="${userDetails.username}"></span>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/index}">Admin Dashboard</a>
+        </span>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </span>
+    <span th:unless="${userDetails}">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Registrati</a>
+    </span>
+</nav>
+
+<h1>
+    <span th:text="${match.homeTeam?.name}">Casa</span>
+    vs
+    <span th:text="${match.awayTeam?.name}">Ospite</span>
+</h1>
+
+<p th:text="'Data: ' + ${match.dateTime}"></p>
+<p th:text="'Luogo: ' + ${match.local}"></p>
+<p th:text="'Stato: ' + ${match.state}"></p>
+<p th:if="${match.referee != null}"
+   th:text="'Arbitro: ' + ${match.referee.name} + ' ' + ${match.referee.surname}"></p>
+<p th:if="${match.tournament != null}">
+    Torneo: <a th:href="@{/tournaments/{id}(id=${match.tournament.id})}"
+               th:text="${match.tournament.name}"></a>
+</p>
+
+<div th:if="${match.state.name() == 'PLAYED'}">
+    <h2>Risultato</h2>
+    <p th:text="${match.homeTeam?.name} + ' '
+              + ${match.goalsHome} + ' - '
+              + ${match.goalsAway} + ' '
+              + ${match.awayTeam?.name}"></p>
+</div>
+
+<sec:authorize access="hasAuthority('ADMIN')">
+    <div>
+        <a th:href="@{/admin/matches/{id}/result(id=${match.id})}">
+            <span th:if="${match.state.name() == 'PLAYED'}">Modifica risultato</span>
+            <span th:unless="${match.state.name() == 'PLAYED'}">Inserisci risultato</span>
+        </a>
+        |
+        <form th:action="@{/admin/matches/{id}/delete(id=${match.id})}"
+              method="POST" style="display:inline">
+            <button type="submit"
+                    onclick="return confirm('Eliminare la partita?')">Elimina</button>
+        </form>
+    </div>
+</sec:authorize>
+
+<hr/>
+<h2>Commenti</h2>
+
+<p th:if="${#lists.isEmpty(comments)}">Nessun commento ancora.</p>
+
+<div th:each="c : ${comments}">
+    <p>
+        <strong th:text="${c.author.username}"></strong>
+        <small th:text="' - ' + ${c.createdAt}"></small>
+    </p>
+    <p th:text="${c.text}"></p>
+    <sec:authorize access="isAuthenticated()">
+        <a th:if="${c.author.username == #authentication.name}"
+           th:href="@{/matches/{mId}/comments/{cId}/edit(mId=${match.id}, cId=${c.id})}">
+            Modifica
+        </a>
+    </sec:authorize>
+    <hr/>
+</div>
+
+<sec:authorize access="isAuthenticated()">
+    <h3>Lascia un commento</h3>
+    <form th:action="@{/matches/{id}/comments(id=${match.id})}"
+          th:object="${newComment}" method="POST">
+        <div>
+            <textarea th:field="*{text}" rows="3" cols="60"
+                      maxlength="1000"
+                      placeholder="Scrivi il tuo commento..."></textarea>
+            <span th:if="${#fields.hasErrors('text')}"
+                  th:errors="*{text}" style="color:red"></span>
+        </div>
+        <button type="submit">Invia</button>
+    </form>
+</sec:authorize>
+
+<sec:authorize access="!isAuthenticated()">
+    <p><a th:href="@{/login}">Accedi</a> per lasciare un commento.</p>
+</sec:authorize>
+
+<br/>
+<a th:if="${match.tournament != null}"
+   th:href="@{/tournaments/{id}(id=${match.tournament.id})}">← Torna al torneo</a>
+</body>
+</html>

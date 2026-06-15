@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Modifica Commento</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+</nav>
+
+<h1>Modifica il tuo commento</h1>
+
+<form th:action="@{/matches/{matchId}/comments/{commentId}/edit(matchId=${matchId}, commentId=${comment.id})}"
+      th:object="${comment}" method="POST">
+    <div>
+        <textarea th:field="*{text}" rows="4" cols="60"
+                  maxlength="1000"></textarea>
+        <span th:if="${#fields.hasErrors('text')}"
+              th:errors="*{text}" style="color:red"></span>
+    </div>
+    <br/>
+    <button type="submit">Salva</button>
+    <a th:href="@{/matches/{id}(id=${matchId})}">Annulla</a>
+</form>
+</body>
+</html>

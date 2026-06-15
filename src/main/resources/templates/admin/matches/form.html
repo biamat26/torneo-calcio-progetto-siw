@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nuova Partita</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/admin/index}">Admin Dashboard</a>
+</nav>
+
+<h1>Registra Nuova Partita</h1>
+
+<form th:action="@{/admin/matches}" th:object="${match}" method="POST">
+
+    <div>
+        <label>Torneo:</label>
+        <select name="tournamentId" required>
+            <option value="">-- Seleziona torneo --</option>
+            <option th:each="t : ${tournaments}"
+                    th:value="${t.id}"
+                    th:text="${t.name}"></option>
+        </select>
+    </div>
+
+    <div>
+        <label>Squadra di casa:</label>
+        <select name="homeTeamId" required>
+            <option value="">-- Seleziona squadra --</option>
+            <option th:each="t : ${teams}"
+                    th:value="${t.id}"
+                    th:text="${t.name}"></option>
+        </select>
+    </div>
+
+    <div>
+        <label>Squadra ospite:</label>
+        <select name="awayTeamId" required>
+            <option value="">-- Seleziona squadra --</option>
+            <option th:each="t : ${teams}"
+                    th:value="${t.id}"
+                    th:text="${t.name}"></option>
+        </select>
+    </div>
+
+    <div>
+        <label>Arbitro:</label>
+        <select name="refereeId" required>
+            <option value="">-- Seleziona arbitro --</option>
+            <option th:each="r : ${referees}"
+                    th:value="${r.id}"
+                    th:text="${r.name} + ' ' + ${r.surname}
+                             + ' (' + ${r.referee_code} + ')'"></option>
+        </select>
+    </div>
+
+    <div>
+        <label>Data e ora:</label>
+        <input type="datetime-local" th:field="*{dateTime}" required />
+        <span th:if="${#fields.hasErrors('dateTime')}"
+              th:errors="*{dateTime}" style="color:red"></span>
+    </div>
+
+    <div>
+        <label>Luogo:</label>
+        <input type="text" th:field="*{local}" required />
+        <span th:if="${#fields.hasErrors('local')}"
+              th:errors="*{local}" style="color:red"></span>
+    </div>
+
+    <br/>
+    <button type="submit">Registra partita</button>
+    <a th:href="@{/tournaments}">Annulla</a>
+</form>
+</body>
+</html>

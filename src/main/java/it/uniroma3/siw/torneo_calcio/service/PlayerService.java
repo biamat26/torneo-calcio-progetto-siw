@@ -27,4 +27,14 @@ public class PlayerService {
         return playerRepository.findById(id);
     }
 
+    @Transactional
+    public Player save(Player player){
+        return this.playerRepository.save(player);
+    }
+
+    @Transactional
+    public void delete(Long idPlayer){
+        Optional<Player> player = this.playerRepository.findById(idPlayer);
+        player.ifPresent(playerRepository::delete);
+    }
 }

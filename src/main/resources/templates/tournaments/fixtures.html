@@ -1,37 +1,55 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Calendario Torneo</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <span th:if="${userDetails}">
+        <span th:text="${userDetails.username}"></span>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/index}">Admin Dashboard</a>
+        </span>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </span>
+    <span th:unless="${userDetails}">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Registrati</a>
+    </span>
+</nav>
 
-<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <head>
-        <title>Calendario Torneo</title>
-    </head>
-    <body>
-    <nav>
-        <a th:href="@{/}">Home</a>
-        <a th:href="@{/tournaments}">Tornei</a>
-        <a th:href="@{/teams}">Squadre</a>
-        <a th:href="@{/matches}">Partite</a>
-        <span th:if="${userDetails}">
-                    <span th:text="${userDetails.username}"></span>
-                    <span sec:authorize="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/index}">Admin Dashboard</a>
-                    </span>
-                    <form th:action="@{/logout}" method = "POST">
-                        <button type="submit">Logout</button>
-                    </form>
-                </span>
-        <span th:unless="${userDetails}">
-                    <a th:href="@{/login}">Login</a>
-                    <a th:href="@{/register}">Registrati</a>
-                </span>
-    </nav>
+<h1 th:text="'Calendario ' + ${tournament.name}"></h1>
 
-    <h1 th:text="'Calendario ' + ${tournament.name}"></h1>
-    <ol>
-        <li th:each="match : ${fixtures}">
-            <span th:text="${match.homeTeam.name} + ' vs ' + ${match.awayTeam.name} + ' - ' + ${match.dateTime}"></span>
+<sec:authorize access="hasAuthority('ADMIN')">
+    <a th:href="@{/admin/matches/new}">+ Registra nuova partita</a>
+</sec:authorize>
+
+<ol>
+    <li th:each="match : ${fixtures}">
+        <a th:href="@{/matches/{id}(id=${match.id})}"
+           th:text="${match.homeTeam.name} + ' vs '
+                   + ${match.awayTeam.name} + ' - '
+                   + ${match.dateTime}"></a>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/matches/{id}/result(id=${match.id})}">
+                Inserisci risultato
+            </a>
+            <form th:action="@{/admin/matches/{id}/delete(id=${match.id})}"
+                  method="POST" style="display:inline">
+                <button type="submit"
+                        onclick="return confirm('Eliminare questa partita?')">
+                    Elimina
+                </button>
+            </form>
+        </span>
     </li>
-    </ol>
+</ol>
 
-
-    </body>
+</body>
 </html>

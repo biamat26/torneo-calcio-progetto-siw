@@ -31,10 +31,23 @@
 
     <h2>Giocatori</h2>
     <ul>
-        <li th:each="player : ${team.players}"
-            th:text="${player.name} + ' ' + ${player.surname} + ' - ' + ${player.role}">
+        <li th:each="player : ${team.players}">
+            <a th:href="@{/players/{id}(id=${player.id})}"
+               th:text="${player.name} + ' ' + ${player.surname} + ' - ' + ${player.role}"></a>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/players/{id}/edit(id=${player.id})}">Modifica</a>
+                <form th:action="@{/admin/players/{id}/delete(id=${player.id})}"
+                      method="POST" style="display:inline">
+                    <button type="submit"
+                            onclick="return confirm('Eliminare il giocatore?')">Elimina</button>
+                </form>
+            </span>
         </li>
     </ul>
+
+    <sec:authorize access="hasAuthority('ADMIN')">
+        <a th:href="@{/admin/players/new}">+ Aggiungi giocatore</a>
+    </sec:authorize>
 
     </body>
 </html>

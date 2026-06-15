@@ -44,4 +44,13 @@ public class MatchService {
         return matchRepository.findTop5ByStateOrderByDateTimeAsc(MatchStatus.SCHEDULED);
     }
 
+    @Transactional
+    public Match save(Match match){
+        return matchRepository.save(match);
+    }
+
+    @Transactional
+    public void delete(Long id){
+        this.matchRepository.findById(id).ifPresent(matchRepository::delete);
+    }
 }

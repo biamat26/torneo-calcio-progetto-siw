@@ -50,7 +50,7 @@ public class TeamController {
         Team team = new Team();
         team.setPlayers(new ArrayList<>());
         model.addAttribute("team", team);
-        model.addAttribute("players", teamService.findAll());
+        model.addAttribute("players", playerService.findAll());
         return "admin/teams/form";
     }
 

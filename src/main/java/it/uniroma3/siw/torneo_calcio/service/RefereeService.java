@@ -24,4 +24,9 @@ public class RefereeService {
 
     @Transactional(readOnly = true)
     public List<Referee> findAll(){return this.refereeRepository.findAll();}
+
+    @Transactional
+    public Referee save(Referee referee){
+        return refereeRepository.save(referee);
+    }
 }

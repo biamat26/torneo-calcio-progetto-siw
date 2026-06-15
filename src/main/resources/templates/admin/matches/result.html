@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Risultato Partita</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/admin/index}">Admin Dashboard</a>
+</nav>
+
+<h1>Inserisci Risultato</h1>
+
+<h2>
+    <span th:text="${match.homeTeam?.name}"></span>
+    vs
+    <span th:text="${match.awayTeam?.name}"></span>
+</h2>
+<p th:text="'Data: ' + ${match.dateTime}"></p>
+<p th:text="'Luogo: ' + ${match.local}"></p>
+
+<form th:action="@{/admin/matches/{id}/result(id=${match.id})}" method="POST">
+    <div>
+        <label th:text="'Goal ' + ${match.homeTeam?.name} + ':'"></label>
+        <input type="number" name="goalsHome"
+               th:value="${match.goalsHome != null ? match.goalsHome : 0}"
+               min="0" max="99" required />
+    </div>
+    <div>
+        <label th:text="'Goal ' + ${match.awayTeam?.name} + ':'"></label>
+        <input type="number" name="goalsAway"
+               th:value="${match.goalsAway != null ? match.goalsAway : 0}"
+               min="0" max="99" required />
+    </div>
+    <br/>
+    <button type="submit">Conferma risultato</button>
+    <a th:if="${match.tournament != null}"
+       th:href="@{/tournaments/{id}(id=${match.tournament.id})}">Annulla</a>
+</form>
+</body>
+</html>

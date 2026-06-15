@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Giocatore</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <span th:if="${userDetails}">
+        <span th:text="${userDetails.username}"></span>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/index}">Admin Dashboard</a>
+        </span>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </span>
+    <span th:unless="${userDetails}">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Registrati</a>
+    </span>
+</nav>
+
+<h1 th:text="${player.name} + ' ' + ${player.surname}"></h1>
+<p th:text="'Data di nascita: ' + ${player.birth_date}"></p>
+<p th:text="'Ruolo: ' + ${player.role}"></p>
+<p th:text="'Altezza: ' + ${player.height} + ' cm'"></p>
+<p th:if="${player.team != null}">
+    Squadra: <a th:href="@{/teams/{id}(id=${player.team.id})}"
+                th:text="${player.team.name}"></a>
+</p>
+
+<sec:authorize access="hasAuthority('ADMIN')">
+    <a th:href="@{/admin/players/{id}/edit(id=${player.id})}">Modifica</a>
+    <form th:action="@{/admin/players/{id}/delete(id=${player.id})}"
+          method="POST" style="display:inline">
+        <button type="submit"
+                onclick="return confirm('Eliminare il giocatore?')">Elimina</button>
+    </form>
+</sec:authorize>
+
+<br/>
+<a th:href="@{/teams}">← Torna alle squadre</a>
+</body>
+</html>

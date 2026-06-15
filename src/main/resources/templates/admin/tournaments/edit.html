@@ -1,59 +1,98 @@
 <!DOCTYPE html>
-
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <head>
-        <title>Edit Tournament</title>
-    </head>
+<head>
+    <title>Inserimento Torneo</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/matches}">Partite</a>
+    <span th:if="${userDetails}">
+        <span th:text="${userDetails.username}"></span>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/index}">Admin Dashboard</a>
+        </span>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </span>
+    <span th:unless="${userDetails}">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Registrati</a>
+    </span>
+</nav>
 
-    <body>
-    <header>
+<h1>Aggiungi un torneo</h1>
 
+<!-- Form principale per nome/anno/descrizione e addTeam -->
+<form id="mainForm" th:action="@{/admin/tournaments}"
+      method="POST" th:object="${tournament}">
 
-        <nav>
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tornei</a>
-            <a th:href="@{/teams}">Squadre</a>
-            <a th:href="@{/matches}">Partite</a>
-            <span th:if="${userDetails}">
-                    <span th:text="${userDetails.username}"></span>
-                    <span sec:authorize="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/index}">Admin Dashboard</a>
-                    </span>
-                    <form th:action="@{/logout}" method = "POST">
-                        <button type="submit">Logout</button>
-                    </form>
-                </span>
-            <span th:unless="${userDetails}">
-                    <a th:href="@{/login}">Login</a>
-                    <a th:href="@{/register}">Registrati</a>
-                </span>
-        </nav>
-    </header>
+    <div>
+        <label>Nome:</label>
+        <input type="text" th:field="*{name}" />
+        <span th:if="${#fields.hasErrors('name')}"
+              th:errors="*{name}" style="color:red"></span>
+    </div>
+    <div>
+        <label>Anno:</label>
+        <input type="text" th:field="*{year}" />
+        <span th:if="${#fields.hasErrors('year')}"
+              th:errors="*{year}" style="color:red"></span>
+    </div>
+    <div>
+        <label>Descrizione:</label>
+        <input type="text" th:field="*{description}" />
+    </div>
 
-        <h1>Modifica torneo</h1>
+    <!-- Hidden per mantenere la lista squadre tra i submit -->
+    <input type="hidden" th:each="t : *{teams}"
+           th:name="teamIds" th:value="${t.id}" />
 
-    <form th:action="@{/admin/tournaments/{id}(id=${tournament.id})}" method="POST" th:object="${tournament}">
-        <div th:if="${#fields.hasGlobalErrors()}">
-            <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">...</p>
-        </div>
-        <div>
-            Nome: <span><input type="text" th:field="*{name}"/></span>
-            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-        </div>
+    <!-- Squadre già nel torneo -->
+    <h3>Squadre nel torneo</h3>
+    <p th:if="${#lists.isEmpty(tournament.teams)}">Nessuna squadra aggiunta.</p>
+    <ul>
+        <li th:each="t : *{teams}">
+            <span th:text="${t.name}"></span>
+            <!-- Form separato per ogni rimozione -->
+            <form th:action="@{/admin/tournaments}" method="POST"
+                  style="display:inline">
+                <!-- Ri-manda tutti i campi del torneo -->
+                <input type="hidden" name="name"
+                       th:value="*{name}" />
+                <input type="hidden" name="year"
+                       th:value="*{year}" />
+                <input type="hidden" name="description"
+                       th:value="*{description}" />
+                <!-- Ri-manda tutte le squadre tranne quella da rimuovere -->
+                <input type="hidden" th:each="other : *{teams}"
+                       th:if="${other.id != t.id}"
+                       th:name="teamIds" th:value="${other.id}" />
+                <input type="hidden" name="action" value="save" />
+                <button type="submit">Rimuovi</button>
+            </form>
+        </li>
+    </ul>
 
-        <div>
-            Anno: <span><input type="text" th:field="*{year}"/></span>
-            <span th:if="${#fields.hasErrors('year')}" th:errors="*{year}"></span>
-        </div>
-        <div>
-            Descrizione: <span><input type="text" th:field="*{description}"/></span>
-            <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
-        </div>
-        <div>
-            <span><button type="submit" name="action" value="save">Conferma</button></span>
-        </div>
-    </form>
+    <!-- Aggiunta squadra -->
+    <h3>Aggiungi squadra</h3>
+    <select name="teamId">
+        <option value="0">-- Seleziona squadra --</option>
+        <option th:each="t : ${teams}"
+                th:value="${t.id}"
+                th:text="${t.name}"
+                th:unless="${tournament.teams.contains(t)}"></option>
+    </select>
+    <button type="submit" name="action" value="addTeam">Aggiungi</button>
 
-    </body>
+    <br/><br/>
+    <button type="submit" name="action" value="save">Conferma</button>
+    <a th:href="@{/tournaments}">Annulla</a>
+
+</form>
+</body>
 </html>

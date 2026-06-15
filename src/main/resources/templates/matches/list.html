@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Partite</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/matches}">Partite</a>
+    <span th:if="${userDetails}">
+        <span th:text="${userDetails.username}"></span>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/index}">Admin Dashboard</a>
+        </span>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </span>
+    <span th:unless="${userDetails}">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Registrati</a>
+    </span>
+</nav>
+
+<h1>Partite</h1>
+
+<h2>Ultimi risultati</h2>
+<p th:if="${#lists.isEmpty(lastResults)}">Nessun risultato disponibile.</p>
+<ul>
+    <li th:each="match : ${lastResults}">
+        <a th:href="@{/matches/{id}(id=${match.id})}"
+           th:text="${match.homeTeam.name} + ' '
+                   + ${match.goalsHome} + ' - '
+                   + ${match.goalsAway} + ' '
+                   + ${match.awayTeam.name}"></a>
+        <small th:text="' | ' + ${match.tournament?.name} + ' | ' + ${match.dateTime}"></small>
+    </li>
+</ul>
+
+<h2>Prossime partite</h2>
+<p th:if="${#lists.isEmpty(upcomingMatches)}">Nessuna partita in programma.</p>
+<ul>
+    <li th:each="match : ${upcomingMatches}">
+        <a th:href="@{/matches/{id}(id=${match.id})}"
+           th:text="${match.homeTeam.name} + ' vs ' + ${match.awayTeam.name}"></a>
+        <small th:text="' | ' + ${match.tournament?.name} + ' | ' + ${match.dateTime}"></small>
+    </li>
+</ul>
+
+<sec:authorize access="hasAuthority('ADMIN')">
+    <br/>
+    <a th:href="@{/admin/matches/new}">+ Registra nuova partita</a>
+</sec:authorize>
+
+</body>
+</html>
