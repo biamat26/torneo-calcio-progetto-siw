@@ -81,6 +81,19 @@ public class TournamentService {
         esistente.setTeams(dati.getTeams());
         tournamentRepository.save(esistente);
     }
+
+    @Transactional
+    public void removeTeamFromTournament(Tournament tournament, Team team) {
+        // Cancella le partite SCHEDULED che coinvolgono la squadra in questo torneo
+        List<Match> toDelete = matchRepository.findScheduledByTournamentAndTeam(
+                tournament, MatchStatus.SCHEDULED, team);
+        matchRepository.deleteAll(toDelete);
+
+        // Rimuove la squadra dal torneo
+        tournament.getTeams().remove(team);
+        tournamentRepository.save(tournament);
+    }
+
 }
 
 

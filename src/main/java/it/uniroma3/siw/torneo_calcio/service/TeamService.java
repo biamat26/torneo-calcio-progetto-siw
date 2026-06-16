@@ -1,8 +1,6 @@
 package it.uniroma3.siw.torneo_calcio.service;
 
-import it.uniroma3.siw.torneo_calcio.model.Player;
-import it.uniroma3.siw.torneo_calcio.model.Team;
-import it.uniroma3.siw.torneo_calcio.model.Tournament;
+import it.uniroma3.siw.torneo_calcio.model.*;
 import it.uniroma3.siw.torneo_calcio.repository.PlayerRepository;
 import it.uniroma3.siw.torneo_calcio.repository.TeamRepository;
 import it.uniroma3.siw.torneo_calcio.repository.TournamentRepository;

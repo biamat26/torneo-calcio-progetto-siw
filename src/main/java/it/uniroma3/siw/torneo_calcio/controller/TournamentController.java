@@ -114,17 +114,6 @@ public class TournamentController {
         return "admin/tournaments/form";
     }
 
-    @PostMapping("/admin/tournaments/removeTeam")
-    public String removeTeam(@RequestParam Long tournamentId,
-                             @RequestParam Long teamId) {
-        Optional<Tournament> optional = tournamentService.findById(tournamentId);
-        if(optional.isEmpty()) return "redirect:/tournaments";
-        Tournament tournament = optional.get();
-        tournament.getTeams().removeIf(t -> t.getId().equals(teamId));
-        tournamentService.save(tournament);
-        return "redirect:/admin/tournaments/" + tournamentId + "/edit";
-    }
-
     @GetMapping("/admin/tournaments/{id}/edit")
     public String edit(@PathVariable("id") Long id, Model model){
         Optional<Tournament> optional = tournamentService.findById(id);
@@ -186,5 +175,17 @@ public class TournamentController {
     public String delete(@PathVariable("id") Long id){
         tournamentService.delete(id);
         return "redirect:/tournaments";
+    }
+
+
+    @PostMapping("/admin/tournaments/removeTeam")
+    public String removeTeam(@RequestParam Long tournamentId,
+                             @RequestParam Long teamId) {
+        Optional<Tournament> tournamentOpt = tournamentService.findById(tournamentId);
+        Optional<Team> teamOpt = teamService.findById(teamId);
+        if(tournamentOpt.isEmpty() || teamOpt.isEmpty()) return "redirect:/tournaments";
+
+        tournamentService.removeTeamFromTournament(tournamentOpt.get(), teamOpt.get());
+        return "redirect:/admin/tournaments/" + tournamentId + "/edit";
     }
 }
