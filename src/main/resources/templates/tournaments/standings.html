@@ -3,53 +3,101 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Classifica</title>
+    <!-- React e Babel standalone — compilano JSX direttamente nel browser -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
 </head>
 <body>
 <nav>
-    <nav>
-        <a th:href="@{/}">Home</a>
-        <a th:href="@{/tournaments}">Tornei</a>
-        <a th:href="@{/teams}">Squadre</a>
-        <a th:href="@{/matches}">Partite</a>
-        <span th:if="${userDetails}">
-                    <span th:text="${userDetails.username}"></span>
-                    <span sec:authorize="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/index}">Admin Dashboard</a>
-                    </span>
-                    <form th:action="@{/logout}" method = "POST">
-                        <button type="submit">Logout</button>
-                    </form>
-                </span>
-        <span th:unless="${userDetails}">
-                    <a th:href="@{/login}">Login</a>
-                    <a th:href="@{/register}">Registrati</a>
-                </span>
-    </nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/matches}">Partite</a>
+    <span th:if="${userDetails}">
+        <span th:text="${userDetails.username}"></span>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/index}">Admin Dashboard</a>
+        </span>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </span>
+    <span th:unless="${userDetails}">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Registrati</a>
+    </span>
 </nav>
 
 <h1 th:text="'Classifica ' + ${tournament.name}"></h1>
 
-<table>
-    <thead>
-    <tr>
-        <th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="row, iter : ${standings}"
-        th:classappend="${iter.count == 1 ? 'rank-gold' : (iter.count == 2 ? 'rank-silver' : (iter.count == 3 ? 'rank-bronze' : ''))}">
-        <td th:text="${iter.count}"></td>
-        <td th:text="${row.team.name}"></td>
-        <td th:text="${row.played}"></td>
-        <td th:text="${row.wins}"></td>
-        <td th:text="${row.draws}"></td>
-        <td th:text="${row.losses}"></td>
-        <td th:text="${row.goalsFor}"></td>
-        <td th:text="${row.goalsAgainst}"></td>
-        <td th:text="${row.goalDifference}"></td>
-        <td th:text="${row.points}"></td>
-    </tr>
-    </tbody>
-</table>
+<!-- React monta qui -->
+<div id="root"
+     th:attr="data-tournament-id=${tournament.id}">
+</div>
+
+<script type="text/babel" data-presets="react">
+    const { useState, useEffect } = React;
+
+    function StandingsTable() {
+        const [standings, setStandings] = useState([]);
+        const [loading, setLoading] = useState(true);
+
+        useEffect(() => {
+            const tournamentId = document.getElementById("root")
+                .getAttribute("data-tournament-id");
+            fetch(`/api/tournaments/${tournamentId}/standings`)
+                .then(res => res.json())
+                .then(data => {
+                    setStandings(data);
+                    setLoading(false);
+                });
+        }, []);
+
+        if (loading) return <p>Caricamento classifica...</p>;
+        if (standings.length === 0) return <p>Nessuna partita giocata ancora.</p>;
+
+        return (
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Squadra</th>
+                    <th>P</th>
+                    <th>V</th>
+                    <th>N</th>
+                    <th>S</th>
+                    <th>GF</th>
+                    <th>GS</th>
+                    <th>DR</th>
+                    <th>Pts</th>
+                </tr>
+                </thead>
+                <tbody>
+                {standings.map((row, index) => (
+                    <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{row.teamName}</td>
+                        <td>{row.played}</td>
+                        <td>{row.wins}</td>
+                        <td>{row.draws}</td>
+                        <td>{row.losses}</td>
+                        <td>{row.goalsFor}</td>
+                        <td>{row.goalsAgainst}</td>
+                        <td>{row.goalDifference}</td>
+                        <td>{row.points}</td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<StandingsTable />);
+</script>
+
+<br/>
+<a th:href="@{/tournaments/{id}(id=${tournament.id})}">← Torna al torneo</a>
 </body>
 </html>

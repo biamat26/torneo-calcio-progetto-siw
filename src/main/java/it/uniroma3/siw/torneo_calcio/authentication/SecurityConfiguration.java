@@ -47,6 +47,7 @@ public class SecurityConfiguration {
                     "/tournaments", "/tournaments/**",
                     "/matches", "/matches/**",
                     "/players", "/players/**",
+                    "/api/**",
                     "/css/**", "/images/**", "/favicon.ico"
             ).permitAll();
             authorize.requestMatchers("/admin/**").hasAnyAuthority("ADMIN");

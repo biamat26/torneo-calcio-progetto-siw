@@ -79,6 +79,11 @@
            th:href="@{/matches/{mId}/comments/{cId}/edit(mId=${match.id}, cId=${c.id})}">
             Modifica
         </a>
+        <form th:if="${c.author.username == #authentication.name}"
+              th:action="@{/matches/{mId}/comments/{cId}/delete(mId=${match.id}, cId=${c.id})}"
+              method="POST" style="display:inline">
+            <button type="submit" onclick="return confirm('Eliminare il commento?')">Elimina</button>
+        </form>
     </sec:authorize>
     <hr/>
 </div>

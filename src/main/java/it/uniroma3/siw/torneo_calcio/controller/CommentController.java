@@ -88,4 +88,21 @@ public class CommentController {
         commentService.save(existing);
         return "redirect:/matches/" + matchId;
     }
+
+    @PostMapping("/matches/{matchId}/comments/{commentId}/delete")
+    public String delete(@PathVariable Long matchId,
+                         @PathVariable Long commentId,
+                         Authentication authentication) {
+        Optional<Comment> commentOpt = commentService.findById(commentId);
+        if(commentOpt.isEmpty()) return "redirect:/matches/" + matchId;
+
+        Comment comment = commentOpt.get();
+        // Solo l'autore o un admin può cancellare
+        if(!comment.getAuthor().getUsername().equals(authentication.getName()) &&
+                !authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"))) {
+            return "redirect:/matches/" + matchId;
+        }
+        commentService.delete(commentId);
+        return "redirect:/matches/" + matchId;
+    }
 }
