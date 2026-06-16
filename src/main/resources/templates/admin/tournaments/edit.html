@@ -36,7 +36,7 @@
         <form th:action="@{/admin/tournaments/removeTeam}" method="POST" style="display:inline">
             <input type="hidden" name="tournamentId" th:value="${tournament.id}" />
             <input type="hidden" name="teamId" th:value="${t.id}" />
-            <button type="submit">Rimuovi</button>
+            <button type="submit" onclick="return confirm('Sei sicuro di voler rimuovere questa squadra dal torneo?')">Rimuovi</button>
         </form>
     </li>
 </ul>

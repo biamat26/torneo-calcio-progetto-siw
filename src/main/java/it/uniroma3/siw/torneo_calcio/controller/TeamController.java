@@ -2,12 +2,9 @@ package it.uniroma3.siw.torneo_calcio.controller;
 
 import it.uniroma3.siw.torneo_calcio.model.Player;
 import it.uniroma3.siw.torneo_calcio.model.Team;
-import it.uniroma3.siw.torneo_calcio.model.Tournament;
 import it.uniroma3.siw.torneo_calcio.service.PlayerService;
 import it.uniroma3.siw.torneo_calcio.service.TeamService;
-import it.uniroma3.siw.torneo_calcio.service.TournamentService;
 import jakarta.validation.Valid;
-import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -37,13 +34,10 @@ public class TeamController {
     @GetMapping("/teams/{id}")
     public String show(@PathVariable("id") Long id, Model model){
         Optional<Team> optional = this.teamService.findById(id);
-        if(optional.isEmpty()){
-            return "redirect:/teams";
-        }
+        if(optional.isEmpty()) return "redirect:/teams";
         model.addAttribute("team", optional.get());
         return "teams/show";
     }
-
 
     @GetMapping("/admin/teams/new")
     public String createForm(Model model){
@@ -55,33 +49,40 @@ public class TeamController {
     }
 
     @PostMapping("/admin/teams")
-    public String save(@Valid @ModelAttribute Team team,
+    public String save(@Valid @ModelAttribute("team") Team team,
                        BindingResult bindingResult,
                        Model model,
                        @RequestParam(required = false) String action,
                        @RequestParam(required = false) Long playerId,
-                       @RequestParam(required = false)List<Long> playerIds){
+                       @RequestParam(required = false) List<Long> playerIds){
+
         List<Player> players = new ArrayList<>();
         if(playerIds != null){
             for(Long id : playerIds){
-                Optional<Player> optional = playerService.findById(id);
-                if(optional.isPresent()){
-                    players.add(optional.get());
-                }
+                playerService.findById(id).ifPresent(players::add);
             }
         }
         team.setPlayers(players);
 
         if("addPlayer".equals(action)){
-            if(playerId!=null && playerId > 0){
-                Optional<Player> player = playerService.findById(playerId);
-                if(player.isPresent() && !team.getPlayers().contains(player.get())){
-                    team.getPlayers().add(player.get());
-                }
+            if(playerId != null && playerId > 0){
+                playerService.findById(playerId).ifPresent(p -> {
+                    if(!team.getPlayers().contains(p))
+                        team.getPlayers().add(p);
+                });
             }
             model.addAttribute("players", playerService.findAll());
             return "admin/teams/form";
         }
+
+        if("removePlayer".equals(action)){
+            if(playerId != null && playerId > 0){
+                team.getPlayers().removeIf(p -> p.getId().equals(playerId));
+            }
+            model.addAttribute("players", playerService.findAll());
+            return "admin/teams/form";
+        }
+
         if(!bindingResult.hasErrors()){
             teamService.save(team);
             return "redirect:/teams";
@@ -92,32 +93,70 @@ public class TeamController {
 
     @GetMapping("/admin/teams/{id}/edit")
     public String edit(@PathVariable("id") Long id, Model model){
-        Optional<Team> teamOptional = teamService.findById(id);
-        if(teamOptional.isPresent()){
-            model.addAttribute("team", teamOptional.get());
-            model.addAttribute("players", playerService.findAll());
-            return "admin/teams/edit";
-        }
-        return "redirect:/teams";
+        Optional<Team> optional = teamService.findById(id);
+        if(optional.isEmpty()) return "redirect:/teams";
+        model.addAttribute("team", optional.get());
+        model.addAttribute("players", playerService.findAll());
+        return "admin/teams/edit";
     }
-
-
 
     @PostMapping("/admin/teams/{id}")
     public String saveEdit(@PathVariable("id") Long id,
-                           @Valid  @ModelAttribute("team") Team team,
+                           @Valid @ModelAttribute("team") Team team,
                            BindingResult bindingResult,
                            Model model,
-                           @RequestParam (required = false) String action){
-        team.setId(id);
-        return save(team, bindingResult, model, null, null, null);
+                           @RequestParam(required = false) String action,
+                           @RequestParam(required = false) Long playerId,
+                           @RequestParam(required = false) List<Long> playerIds){
+
+        Optional<Team> esistenteOpt = teamService.findById(id);
+        if(esistenteOpt.isEmpty()) return "redirect:/teams";
+        Team esistente = esistenteOpt.get();
+
+        List<Player> players = new ArrayList<>();
+        if(playerIds != null){
+            for(Long pid : playerIds){
+                playerService.findById(pid).ifPresent(players::add);
+            }
+        }
+        team.setPlayers(players);
+
+        if("addPlayer".equals(action)){
+            if(playerId != null && playerId > 0){
+                Optional<Player> playerOpt = playerService.findById(playerId);
+                if(playerOpt.isPresent()){
+                    Player player = playerOpt.get();
+                    player.setTeam(esistente);
+                    playerService.save(player);
+                }
+            }
+            return "redirect:/admin/teams/" + id + "/edit";
+        }
+
+        if("removePlayer".equals(action)){
+            if(playerId != null && playerId > 0){
+                Optional<Player> playerOpt = playerService.findById(playerId);
+                if(playerOpt.isPresent()){
+                    Player player = playerOpt.get();
+                    player.setTeam(null);
+                    playerService.save(player);
+                }
+            }
+            return "redirect:/admin/teams/" + id + "/edit";
+        }
+
+        if(!bindingResult.hasErrors()){
+            teamService.update(team, esistente);
+            return "redirect:/teams";
+        }
+        model.addAttribute("team", team);
+        model.addAttribute("players", playerService.findAll());
+        return "admin/teams/edit";
     }
 
-    // TODO: bro non funziona.
     @PostMapping("/admin/teams/{id}/delete")
     public String delete(@PathVariable("id") Long id){
         teamService.delete(id);
         return "redirect:/teams";
     }
-
 }

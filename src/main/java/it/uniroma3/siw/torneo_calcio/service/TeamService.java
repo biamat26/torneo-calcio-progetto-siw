@@ -1,5 +1,6 @@
 package it.uniroma3.siw.torneo_calcio.service;
 
+import it.uniroma3.siw.torneo_calcio.model.Player;
 import it.uniroma3.siw.torneo_calcio.model.Team;
 import it.uniroma3.siw.torneo_calcio.model.Tournament;
 import it.uniroma3.siw.torneo_calcio.repository.PlayerRepository;
@@ -39,34 +40,30 @@ public class TeamService {
         return teamRepository.save(team);
     }
 
+    @Transactional
+    public void update(Team dati, Team esistente){
+        esistente.setName(dati.getName());
+        esistente.setCity(dati.getCity());
+        esistente.setFoundationYear(dati.getFoundationYear());
+        esistente.setPlayers(dati.getPlayers());
+        teamRepository.save(esistente);
+    }
 
     /**
-     *
-     * @param id -> id della squadra da cancellare
-     *
      * Prima di cancellare una squadra, devo rimuoverla dai tornei.
-     *
-     * Se cancello la squadra, non voglio cancellare anche i giocatori. Quindi li scollego e poi
-     * cancello la squadra.
-     *
-     * NOTA: grazie a cascade = CascadeType.REMOVE se cancello una squadra cancellerò anche le partite
-     * a essa associata.
-     *
-     *
+     * I giocatori vengono scollegati (non cancellati).
+     * Le partite associate vengono cancellate in cascade.
      */
     @Transactional
     public void delete(Long id){
         Optional<Team> teamOptional = teamRepository.findById(id);
-
-
         if(teamOptional.isPresent()){
             Team team = teamOptional.get();
-
             for(Tournament tournament : team.getTournaments()){
                 tournament.getTeams().remove(team);
                 tournamentRepository.save(tournament);
             }
-            playerRepository.findByTeam(team).forEach(p ->{
+            playerRepository.findByTeam(team).forEach(p -> {
                 p.setTeam(null);
                 playerRepository.save(p);
             });
@@ -74,4 +71,3 @@ public class TeamService {
         }
     }
 }
-

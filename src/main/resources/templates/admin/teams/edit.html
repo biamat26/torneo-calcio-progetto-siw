@@ -1,69 +1,84 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Modifica Squadra</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/matches}">Partite</a>
+    <span th:if="${userDetails}">
+        <span th:text="${userDetails.username}"></span>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/index}">Admin Dashboard</a>
+        </span>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </span>
+    <span th:unless="${userDetails}">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Registrati</a>
+    </span>
+</nav>
 
-<html  xmlns:th="http://www.thymeleaf.org"
-       xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="">
-    <head>
-        <title>Edit Teams</title>
-    </head>
+<h1>Modifica squadra</h1>
 
-    <body>
-    <header>
-        <nav>
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tornei</a>
-            <a th:href="@{/teams}">Squadre</a>
-            <a th:href="@{/matches}">Partite</a>
-            <span th:if="${userDetails}">
-                    <span th:text="${userDetails.username}"></span>
-                    <span sec:authorize="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/index}">Admin Dashboard</a>
-                    </span>
-                    <form th:action="@{/logout}" method = "POST">
-                        <button type="submit">Logout</button>
-                    </form>
-                </span>
-            <span th:unless="${userDetails}">
-                    <a th:href="@{/login}">Login</a>
-                    <a th:href="@{/register}">Registrati</a>
-                </span>
-        </nav>
-    </header>
+<!-- Giocatori nella squadra — FUORI dal form principale -->
+<h3>Giocatori nella squadra</h3>
+<p th:if="${#lists.isEmpty(team.players)}">Nessun giocatore aggiunto.</p>
+<ul>
+    <li th:each="p : ${team.players}">
+        <span th:text="${p.name + ' ' + p.surname}"></span>
+        <form th:action="@{/admin/teams/{id}(id=${team.id})}" method="POST" style="display:inline">
+            <input type="hidden" name="action" value="removePlayer"/>
+            <input type="hidden" name="playerId" th:value="${p.id}"/>
+            <!-- Rimanda i playerIds attuali tranne quello da rimuovere -->
+            <input type="hidden" th:each="other : ${team.players}"
+                   th:if="${other.id != p.id}"
+                   th:name="playerIds" th:value="${other.id}"/>
+            <button type="submit" onclick="return confirm('Sei sicuro di voler rimuovere il giocatore dalla squadra?')">Rimuovi</button>
+        </form>
+    </li>
+</ul>
 
-        <h1>Modifica squadra</h1>
+<!-- Form principale -->
+<form th:action="@{/admin/teams/{id}(id=${team.id})}"
+      method="POST"
+      th:object="${team}">
 
-    <form th:action="@{/admin/teams/{id}(id=${team.id})}" method="POST" th:object="${team}">
-        <div>
-            Nome: <input type="text" th:field="*{name}"/>
-        </div>
-        <div>
-            Anno fondazione: <input type="text" th:field="*{foundationYear}"/>
-        </div>
-        <div>
-            Città: <input type="text" th:field="*{city}"/>
-        </div>
-        <button type="submit" name="action" value="save">Conferma</button>
-    </form>
-    </body>
+    <div>
+        Nome: <input type="text" th:field="*{name}"/>
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+    </div>
+    <div>
+        Anno fondazione: <input type="text" th:field="*{foundationYear}"/>
+    </div>
+    <div>
+        Città: <input type="text" th:field="*{city}"/>
+    </div>
+
+    <!-- Hidden per mantenere lista giocatori tra i submit -->
+    <input type="hidden" th:each="p : *{players}" th:name="playerIds" th:value="${p.id}"/>
+
+    <!-- Aggiunta giocatore -->
+    <h3>Aggiungi giocatore</h3>
+    <select name="playerId">
+        <option value="0">-- Seleziona giocatore --</option>
+        <option th:each="p : ${players}"
+                th:value="${p.id}"
+                th:text="${p.name + ' ' + p.surname}"
+                th:unless="${team.players.contains(p)}"></option>
+    </select>
+    <button type="submit" name="action" value="addPlayer">Aggiungi</button>
+
+    <br/><br/>
+    <button type="submit" name="action" value="save">Conferma</button>
+    <a th:href="@{/teams}">Annulla</a>
+
+</form>
+</body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

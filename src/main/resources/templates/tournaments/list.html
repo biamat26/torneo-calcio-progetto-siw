@@ -46,7 +46,7 @@
             </span>
             <span sec:authorize="hasAuthority('ADMIN')">
                 <form th:action="@{/admin/tournaments/{id}/delete(id=${tournament.id})}" method="POST">
-                    <button type="submit">Cancella</button>
+                    <button type="submit"onclick="return confirm('Sei sicuro di voler cancellare questo torneo?')">Cancella</button>
                 </form>
             </span>
         </li>

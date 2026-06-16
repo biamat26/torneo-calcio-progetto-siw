@@ -34,7 +34,9 @@
         <span sec:authorize="hasAuthority('ADMIN')">
             <a th:href="@{/admin/teams/{id}/edit(id=${team.id})}">Modifica</a>
             <form th:action="@{/admin/teams/{id}/delete(id=${team.id})}" method="POST">
-                <button type="submit">Cancella</button>
+                <button type="submit"
+                        onclick="return confirm('Sei sicuro di voler cancellare questa squadra? Cancellerai anche tutte le partite ad essa associata')">
+                    Cancella</button>
             </form>
         </span>
     </li>
