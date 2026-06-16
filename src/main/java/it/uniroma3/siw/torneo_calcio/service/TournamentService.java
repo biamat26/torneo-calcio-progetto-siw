@@ -71,9 +71,16 @@ public class TournamentService {
     public void delete(Long id){
         Optional<Tournament> tournament = tournamentRepository.findById(id);
         tournament.ifPresent(tournamentRepository::delete);
-
     }
 
+    @Transactional
+    public void update(Tournament dati, Tournament esistente) {
+        esistente.setName(dati.getName());
+        esistente.setYear(dati.getYear());
+        esistente.setDescription(dati.getDescription());
+        esistente.setTeams(dati.getTeams());
+        tournamentRepository.save(esistente);
+    }
 }
 
 

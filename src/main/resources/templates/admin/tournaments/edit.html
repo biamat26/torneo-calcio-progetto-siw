@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Inserimento Torneo</title>
+    <title>Modifica Torneo</title>
 </head>
 <body>
 <nav>
@@ -25,11 +25,27 @@
     </span>
 </nav>
 
-<h1>Aggiungi un torneo</h1>
+<h1>Modifica torneo</h1>
 
-<!-- Form principale per nome/anno/descrizione e addTeam -->
-<form id="mainForm" th:action="@{/admin/tournaments}"
-      method="POST" th:object="${tournament}">
+<!-- Rimozione squadre — FUORI dal form principale -->
+<h3>Squadre nel torneo</h3>
+<p th:if="${#lists.isEmpty(tournament.teams)}">Nessuna squadra aggiunta.</p>
+<ul>
+    <li th:each="t : ${tournament.teams}">
+        <span th:text="${t.name}"></span>
+        <form th:action="@{/admin/tournaments/removeTeam}" method="POST" style="display:inline">
+            <input type="hidden" name="tournamentId" th:value="${tournament.id}" />
+            <input type="hidden" name="teamId" th:value="${t.id}" />
+            <button type="submit">Rimuovi</button>
+        </form>
+    </li>
+</ul>
+
+<!-- Form principale -->
+<form id="mainForm"
+      th:action="@{/admin/tournaments/{id}(id=${tournament.id})}"
+      method="POST"
+      th:object="${tournament}">
 
     <div>
         <label>Nome:</label>
@@ -48,37 +64,9 @@
         <input type="text" th:field="*{description}" />
     </div>
 
-    <!-- Hidden per mantenere la lista squadre tra i submit -->
     <input type="hidden" th:each="t : *{teams}"
            th:name="teamIds" th:value="${t.id}" />
 
-    <!-- Squadre già nel torneo -->
-    <h3>Squadre nel torneo</h3>
-    <p th:if="${#lists.isEmpty(tournament.teams)}">Nessuna squadra aggiunta.</p>
-    <ul>
-        <li th:each="t : *{teams}">
-            <span th:text="${t.name}"></span>
-            <!-- Form separato per ogni rimozione -->
-            <form th:action="@{/admin/tournaments}" method="POST"
-                  style="display:inline">
-                <!-- Ri-manda tutti i campi del torneo -->
-                <input type="hidden" name="name"
-                       th:value="*{name}" />
-                <input type="hidden" name="year"
-                       th:value="*{year}" />
-                <input type="hidden" name="description"
-                       th:value="*{description}" />
-                <!-- Ri-manda tutte le squadre tranne quella da rimuovere -->
-                <input type="hidden" th:each="other : *{teams}"
-                       th:if="${other.id != t.id}"
-                       th:name="teamIds" th:value="${other.id}" />
-                <input type="hidden" name="action" value="save" />
-                <button type="submit">Rimuovi</button>
-            </form>
-        </li>
-    </ul>
-
-    <!-- Aggiunta squadra -->
     <h3>Aggiungi squadra</h3>
     <select name="teamId">
         <option value="0">-- Seleziona squadra --</option>

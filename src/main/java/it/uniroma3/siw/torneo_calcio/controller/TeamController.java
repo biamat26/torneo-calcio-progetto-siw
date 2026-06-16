@@ -113,7 +113,7 @@ public class TeamController {
         return save(team, bindingResult, model, null, null, null);
     }
 
-
+    // TODO: bro non funziona.
     @PostMapping("/admin/teams/{id}/delete")
     public String delete(@PathVariable("id") Long id){
         teamService.delete(id);

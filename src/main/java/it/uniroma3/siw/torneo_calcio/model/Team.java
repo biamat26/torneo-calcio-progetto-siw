@@ -24,10 +24,16 @@ public class Team {
     @OneToMany(mappedBy = "team", fetch = FetchType.EAGER)
     private List<Player> players;
 
-    @OneToMany(mappedBy = "homeTeam")
+    /**
+     * Con
+     * cascade = CascadeType.REMOVE
+     * in quanto se cancello una squadra, devo cancellare anche
+     * le partite associate.
+     */
+    @OneToMany(mappedBy = "homeTeam", cascade = CascadeType.REMOVE)
     private List<Match> homeMatches;
 
-    @OneToMany(mappedBy = "awayTeam")
+    @OneToMany(mappedBy = "awayTeam", cascade = CascadeType.REMOVE)
     private List<Match> awayMatches;
 
 

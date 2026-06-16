@@ -1,7 +1,10 @@
 package it.uniroma3.siw.torneo_calcio.service;
 
 import it.uniroma3.siw.torneo_calcio.model.Team;
+import it.uniroma3.siw.torneo_calcio.model.Tournament;
+import it.uniroma3.siw.torneo_calcio.repository.PlayerRepository;
 import it.uniroma3.siw.torneo_calcio.repository.TeamRepository;
+import it.uniroma3.siw.torneo_calcio.repository.TournamentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,10 +13,15 @@ import java.util.Optional;
 
 @Service
 public class TeamService {
-    private final TeamRepository teamRepository;
 
-    public TeamService(TeamRepository teamRepository){
+    private final TeamRepository teamRepository;
+    private final PlayerRepository playerRepository;
+    private final TournamentRepository tournamentRepository;
+
+    public TeamService(TeamRepository teamRepository, PlayerRepository playerRepository, TournamentRepository tournamentRepository){
         this.teamRepository = teamRepository;
+        this.playerRepository = playerRepository;
+        this.tournamentRepository = tournamentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -31,10 +39,39 @@ public class TeamService {
         return teamRepository.save(team);
     }
 
+
+    /**
+     *
+     * @param id -> id della squadra da cancellare
+     *
+     * Prima di cancellare una squadra, devo rimuoverla dai tornei.
+     *
+     * Se cancello la squadra, non voglio cancellare anche i giocatori. Quindi li scollego e poi
+     * cancello la squadra.
+     *
+     * NOTA: grazie a cascade = CascadeType.REMOVE se cancello una squadra cancellerò anche le partite
+     * a essa associata.
+     *
+     *
+     */
     @Transactional
     public void delete(Long id){
-        Optional<Team> team = teamRepository.findById(id);
-        team.ifPresent(teamRepository::delete);
+        Optional<Team> teamOptional = teamRepository.findById(id);
+
+
+        if(teamOptional.isPresent()){
+            Team team = teamOptional.get();
+
+            for(Tournament tournament : team.getTournaments()){
+                tournament.getTeams().remove(team);
+                tournamentRepository.save(tournament);
+            }
+            playerRepository.findByTeam(team).forEach(p ->{
+                p.setTeam(null);
+                playerRepository.save(p);
+            });
+            teamRepository.delete(team);
+        }
     }
 }
 
