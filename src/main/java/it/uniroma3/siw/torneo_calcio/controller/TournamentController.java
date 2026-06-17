@@ -37,7 +37,7 @@ public class TournamentController {
     @GetMapping("/tournaments")
     public String list(Model model){
         model.addAttribute("tournaments", this.tournamentService.findAll());
-        return "/tournaments/list";
+        return "tournaments/list";
     }
 
     @GetMapping("/tournaments/{id}")
