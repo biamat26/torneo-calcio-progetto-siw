@@ -1,46 +1,53 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Crea Nuova Squadra</title>
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/matches}">Partite</a>
+    <span th:if="${userDetails}">
+        <span th:text="${userDetails.username}"></span>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/index}">Admin Dashboard</a>
+        </span>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </span>
+    <span th:unless="${userDetails}">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Registrati</a>
+    </span>
+</nav>
 
-<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <head>
-        <title>
+<h1>Crea Nuova Squadra</h1>
 
-        </title>
-    </head>
-
-    <body>
-    <nav>
-        <a th:href="@{/}">Home</a>
-        <a th:href="@{/tournaments}">Tornei</a>
-        <a th:href="@{/teams}">Squadre</a>
-        <a th:href="@{/matches}">Partite</a>
-        <span th:if="${userDetails}">
-                    <span th:text="${userDetails.username}"></span>
-                    <span sec:authorize="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/index}">Admin Dashboard</a>
-                    </span>
-                    <form th:action="@{/logout}" method = "POST">
-                        <button type="submit">Logout</button>
-                    </form>
-                </span>
-        <span th:unless="${userDetails}">
-                    <a th:href="@{/login}">Login</a>
-                    <a th:href="@{/register}">Registrati</a>
-                </span>
-    </nav>
-
-    <h1>Crea Nuova Squadra</h1>
-    <form th:action="@{/admin/teams}" method="POST" th:object="${team}">
-        <div>
-            Nome: <input type="text" th:field="*{name}"/>
-            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-        </div>
-        <div>
-            Anno fondazione: <input type="text" th:field="*{foundationYear}"/>
-        </div>
-        <div>
-            Città: <input type="text" th:field="*{city}"/>
-        </div>
-        <button type="submit" name="action" value="save">Conferma</button>
-    </form>
-    </body>
+<form th:action="@{/admin/teams}" method="POST" th:object="${team}"
+      enctype="multipart/form-data">
+    <div>
+        <label>Nome:</label>
+        <input type="text" th:field="*{name}"/>
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+    </div>
+    <div>
+        <label>Anno fondazione:</label>
+        <input type="text" th:field="*{foundationYear}"/>
+    </div>
+    <div>
+        <label>Città:</label>
+        <input type="text" th:field="*{city}"/>
+    </div>
+    <div>
+        <label>Logo squadra:</label>
+        <input type="file" name="logo" accept="image/*"/>
+    </div>
+    <button type="submit" name="action" value="save">Conferma</button>
+    <a th:href="@{/teams}">Annulla</a>
+</form>
+</body>
 </html>

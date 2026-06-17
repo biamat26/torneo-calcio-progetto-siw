@@ -18,7 +18,9 @@ public class Team {
 
     private String city;
 
-    @ManyToMany(mappedBy = "teams", fetch = FetchType.EAGER)
+    private String logoUrl;
+
+    @ManyToMany(mappedBy = "teams")
     private List<Tournament> tournaments;
 
     @OneToMany(mappedBy = "team", fetch = FetchType.EAGER)
@@ -116,5 +118,13 @@ public class Team {
 
     public void setAwayMatches(List<Match> awayMatches) {
         this.awayMatches = awayMatches;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
     }
 }

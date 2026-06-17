@@ -22,6 +22,8 @@ public class Player {
 
     private Integer height;
 
+    private String photoUrl;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -100,5 +102,13 @@ public class Player {
 
     public void setTeam(Team team) {
         this.team = team;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }

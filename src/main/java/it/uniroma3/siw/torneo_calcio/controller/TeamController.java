@@ -2,14 +2,19 @@ package it.uniroma3.siw.torneo_calcio.controller;
 
 import it.uniroma3.siw.torneo_calcio.model.Player;
 import it.uniroma3.siw.torneo_calcio.model.Team;
+import it.uniroma3.siw.torneo_calcio.service.FileUploadService;
 import it.uniroma3.siw.torneo_calcio.service.PlayerService;
 import it.uniroma3.siw.torneo_calcio.service.TeamService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,10 +24,13 @@ public class TeamController {
 
     private final TeamService teamService;
     private final PlayerService playerService;
+    private final FileUploadService fileUploadService;
+    private static final Logger log = LoggerFactory.getLogger(TeamController.class);
 
-    public TeamController(TeamService teamService, PlayerService playerService){
+    public TeamController(TeamService teamService, PlayerService playerService, FileUploadService fileUploadService){
         this.playerService = playerService;
         this.teamService = teamService;
+        this.fileUploadService = fileUploadService;
     }
 
     @GetMapping("/teams")
@@ -54,7 +62,8 @@ public class TeamController {
                        Model model,
                        @RequestParam(required = false) String action,
                        @RequestParam(required = false) Long playerId,
-                       @RequestParam(required = false) List<Long> playerIds){
+                       @RequestParam(required = false) List<Long> playerIds,
+                       @RequestParam(required = false) MultipartFile logo){
 
         List<Player> players = new ArrayList<>();
         if(playerIds != null){
@@ -84,6 +93,12 @@ public class TeamController {
         }
 
         if(!bindingResult.hasErrors()){
+            try {
+                String logoUrl = fileUploadService.save(logo, "teams");
+                if (logoUrl != null) team.setLogoUrl(logoUrl);
+            } catch (IOException e) {
+                log.error("Errore upload logo: {}", e.getMessage());
+            }
             teamService.save(team);
             return "redirect:/teams";
         }
@@ -158,5 +173,31 @@ public class TeamController {
     public String delete(@PathVariable("id") Long id){
         teamService.delete(id);
         return "redirect:/teams";
+    }
+
+    @PostMapping("/admin/teams/{id}/image")
+    public String uploadImage(@PathVariable Long id,
+                              @RequestParam MultipartFile logo){
+        Optional<Team> optional = teamService.findById(id);
+        if(optional.isEmpty()) return "redirect:/teams";
+        Team team = optional.get();
+        try {
+            String logoUrl = fileUploadService.save(logo, "teams");
+            if (logoUrl != null) team.setLogoUrl(logoUrl);
+            teamService.save(team);
+        } catch (IOException e) {
+            log.error("Errore upload logo squadra: {}", e.getMessage());
+        }
+        return "redirect:/admin/teams/" + id + "/edit";
+    }
+
+    @PostMapping("/admin/teams/{id}/image/delete")
+    public String deleteImage(@PathVariable Long id) {
+        Optional<Team> optional = teamService.findById(id);
+        if(optional.isEmpty()) return "redirect:/teams";
+        Team team = optional.get();
+        team.setLogoUrl(null);
+        teamService.save(team);
+        return "redirect:/admin/teams/" + id + "/edit";
     }
 }

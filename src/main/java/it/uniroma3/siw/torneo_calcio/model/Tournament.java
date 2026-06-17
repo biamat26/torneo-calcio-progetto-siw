@@ -20,7 +20,9 @@ public class Tournament {
     @Column(length = 2000)
     private String description;
 
-    @ManyToMany
+    private String imageUrl;
+
+    @ManyToMany//(fetch = FetchType.EAGER)
     private List<Team> teams;
 
     @OneToMany(mappedBy = "tournament", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
@@ -92,5 +94,13 @@ public class Tournament {
 
     public void setMatches(List<Match> matches) {
         this.matches = matches;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

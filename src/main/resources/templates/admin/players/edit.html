@@ -11,19 +11,37 @@
 
 <h1>Modifica Giocatore</h1>
 
+<!-- Form separato per la foto -->
+<div>
+    <h3>Foto giocatore</h3>
+    <img th:if="${player.photoUrl != null}"
+         th:src="${player.photoUrl}"
+         alt="Foto giocatore"
+         style="width:100px; height:100px; object-fit:cover; border-radius:50%; display:block; margin-bottom:0.5rem;"/>
+    <form th:if="${player.photoUrl == null}"
+          th:action="@{/admin/players/{id}/image(id=${player.id})}"
+          method="POST" enctype="multipart/form-data">
+        <input type="file" name="photo" accept="image/*"/>
+        <button type="submit">Carica foto</button>
+    </form>
+    <form th:if="${player.photoUrl != null}"
+          th:action="@{/admin/players/{id}/image/delete(id=${player.id})}"
+          method="POST" style="display:inline">
+        <button type="submit" onclick="return confirm('Rimuovere la foto?')">Rimuovi la foto</button>
+    </form>
+</div>
+
 <form th:action="@{/admin/players/{id}(id=${player.id})}"
       th:object="${player}" method="POST">
     <div>
         <label>Nome:</label>
         <input type="text" th:field="*{name}" />
-        <span th:if="${#fields.hasErrors('name')}"
-              th:errors="*{name}" style="color:red"></span>
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></span>
     </div>
     <div>
         <label>Cognome:</label>
         <input type="text" th:field="*{surname}" />
-        <span th:if="${#fields.hasErrors('surname')}"
-              th:errors="*{surname}" style="color:red"></span>
+        <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" style="color:red"></span>
     </div>
     <div>
         <label>Data di nascita:</label>
@@ -37,9 +55,7 @@
         <label>Ruolo:</label>
         <select th:field="*{role}">
             <option value="">-- Seleziona ruolo --</option>
-            <option th:each="r : ${roles}"
-                    th:value="${r}"
-                    th:text="${r}"></option>
+            <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
         </select>
     </div>
     <div>

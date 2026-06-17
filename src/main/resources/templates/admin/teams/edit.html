@@ -27,6 +27,26 @@
 
 <h1>Modifica squadra</h1>
 
+<!-- Form separato per il logo -->
+<div>
+    <h3>Logo squadra</h3>
+    <img th:if="${team.logoUrl != null}"
+         th:src="${team.logoUrl}"
+         alt="Logo squadra"
+         style="width:100px; height:100px; object-fit:contain; display:block; margin-bottom:0.5rem;"/>
+    <form th:if="${team.logoUrl == null}"
+            th:action="@{/admin/teams/{id}/image(id=${team.id})}"
+          method="POST" enctype="multipart/form-data">
+        <input type="file" name="logo" accept="image/*"/>
+        <button type="submit">Carica logo</button>
+    </form>
+    <form th:if="${team.logoUrl != null}"
+          th:action="@{/admin/teams/{id}/image/delete(id=${team.id})}"
+          method="POST" style="display:inline">
+        <button type="submit" onclick="return confirm('Rimuovere il logo della squadra?')">Rimuovi logo</button>
+    </form>
+</div>
+
 <!-- Giocatori nella squadra — FUORI dal form principale -->
 <h3>Giocatori nella squadra</h3>
 <p th:if="${#lists.isEmpty(team.players)}">Nessun giocatore aggiunto.</p>
@@ -36,7 +56,6 @@
         <form th:action="@{/admin/teams/{id}(id=${team.id})}" method="POST" style="display:inline">
             <input type="hidden" name="action" value="removePlayer"/>
             <input type="hidden" name="playerId" th:value="${p.id}"/>
-            <!-- Rimanda i playerIds attuali tranne quello da rimuovere -->
             <input type="hidden" th:each="other : ${team.players}"
                    th:if="${other.id != p.id}"
                    th:name="playerIds" th:value="${other.id}"/>
@@ -51,20 +70,21 @@
       th:object="${team}">
 
     <div>
-        Nome: <input type="text" th:field="*{name}"/>
+        <label>Nome:</label>
+        <input type="text" th:field="*{name}"/>
         <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
     </div>
     <div>
-        Anno fondazione: <input type="text" th:field="*{foundationYear}"/>
+        <label>Anno fondazione:</label>
+        <input type="text" th:field="*{foundationYear}"/>
     </div>
     <div>
-        Città: <input type="text" th:field="*{city}"/>
+        <label>Città:</label>
+        <input type="text" th:field="*{city}"/>
     </div>
 
-    <!-- Hidden per mantenere lista giocatori tra i submit -->
     <input type="hidden" th:each="p : *{players}" th:name="playerIds" th:value="${p.id}"/>
 
-    <!-- Aggiunta giocatore -->
     <h3>Aggiungi giocatore</h3>
     <select name="playerId">
         <option value="0">-- Seleziona giocatore --</option>
@@ -78,7 +98,6 @@
     <br/><br/>
     <button type="submit" name="action" value="save">Conferma</button>
     <a th:href="@{/teams}">Annulla</a>
-
 </form>
 </body>
 </html>

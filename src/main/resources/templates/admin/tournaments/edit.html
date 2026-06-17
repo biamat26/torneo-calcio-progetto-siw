@@ -27,6 +27,26 @@
 
 <h1>Modifica torneo</h1>
 
+<!-- Form separato per l'immagine -->
+<div>
+    <h3>Immagine torneo</h3>
+    <img th:if="${tournament.imageUrl != null}"
+         th:src="${tournament.imageUrl}"
+         alt="Immagine torneo"
+         style="width:200px; height:120px; object-fit:cover; border-radius:6px; display:block; margin-bottom:0.5rem;"/>
+    <form th:if="${tournament.imageUrl == null}"
+            th:action="@{/admin/tournaments/{id}/image(id=${tournament.id})}"
+          method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*"/>
+        <button type="submit">Carica immagine</button>
+    </form>
+    <form th:if="${tournament.imageUrl != null}"
+          th:action="@{/admin/tournaments/{id}/image/delete(id=${tournament.id})}"
+          method="POST" style="display:inline">
+        <button type="submit" onclick="return confirm('Rimuovere l\'immagine?')">Rimuovi immagine</button>
+    </form>
+</div>
+
 <!-- Rimozione squadre — FUORI dal form principale -->
 <h3>Squadre nel torneo</h3>
 <p th:if="${#lists.isEmpty(tournament.teams)}">Nessuna squadra aggiunta.</p>
@@ -50,22 +70,19 @@
     <div>
         <label>Nome:</label>
         <input type="text" th:field="*{name}" />
-        <span th:if="${#fields.hasErrors('name')}"
-              th:errors="*{name}" style="color:red"></span>
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></span>
     </div>
     <div>
         <label>Anno:</label>
         <input type="text" th:field="*{year}" />
-        <span th:if="${#fields.hasErrors('year')}"
-              th:errors="*{year}" style="color:red"></span>
+        <span th:if="${#fields.hasErrors('year')}" th:errors="*{year}" style="color:red"></span>
     </div>
     <div>
         <label>Descrizione:</label>
         <input type="text" th:field="*{description}" />
     </div>
 
-    <input type="hidden" th:each="t : *{teams}"
-           th:name="teamIds" th:value="${t.id}" />
+    <input type="hidden" th:each="t : *{teams}" th:name="teamIds" th:value="${t.id}" />
 
     <h3>Aggiungi squadra</h3>
     <select name="teamId">
@@ -80,7 +97,6 @@
     <br/><br/>
     <button type="submit" name="action" value="save">Conferma</button>
     <a th:href="@{/tournaments}">Annulla</a>
-
 </form>
 </body>
 </html>

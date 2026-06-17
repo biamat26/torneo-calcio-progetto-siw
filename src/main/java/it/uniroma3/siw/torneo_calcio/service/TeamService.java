@@ -38,12 +38,12 @@ public class TeamService {
         return teamRepository.save(team);
     }
 
-    @Transactional
-    public void update(Team dati, Team esistente){
+    public void update(Team dati, Team esistente) {
         esistente.setName(dati.getName());
         esistente.setCity(dati.getCity());
         esistente.setFoundationYear(dati.getFoundationYear());
         esistente.setPlayers(dati.getPlayers());
+        if (dati.getLogoUrl() != null) esistente.setLogoUrl(dati.getLogoUrl());
         teamRepository.save(esistente);
     }
 

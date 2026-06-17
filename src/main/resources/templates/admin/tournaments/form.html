@@ -1,4 +1,3 @@
-```
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
@@ -28,7 +27,8 @@
 
 <h1>Aggiungi un torneo</h1>
 
-<form th:action="@{/admin/tournaments}" method="POST" th:object="${tournament}">
+<form th:action="@{/admin/tournaments}" method="POST" th:object="${tournament}"
+      enctype="multipart/form-data">
 
     <div>
         <label>Nome:</label>
@@ -44,24 +44,26 @@
         <label>Descrizione:</label>
         <input type="text" th:field="*{description}" />
     </div>
+    <div>
+        <label>Immagine torneo:</label>
+        <input type="file" name="image" accept="image/*"/>
+    </div>
 
-    <!-- Hidden per mantenere la lista squadre tra i submit -->
     <input type="hidden" th:each="t : *{teams}" th:name="teamIds" th:value="${t.id}" />
 
-    <!-- Squadre già nel torneo -->
     <h3>Squadre nel torneo</h3>
     <p th:if="${#lists.isEmpty(tournament.teams)}">Nessuna squadra aggiunta.</p>
     <ul>
         <li th:each="t : *{teams}">
             <span th:text="${t.name}"></span>
+            <input type="hidden" name="removeTeamId" th:value="${t.id}"/>
             <button type="submit" name="action" value="removeTeam"
-                    th:name="teamId" th:value="${t.id}">
+                    th:onclick="|document.querySelector('input[name=teamId]').value=${t.id}|">
                 Rimuovi
             </button>
         </li>
     </ul>
 
-    <!-- Aggiunta squadra -->
     <h3>Aggiungi squadra</h3>
     <select name="teamId">
         <option value="0">-- Seleziona squadra --</option>
@@ -75,7 +77,6 @@
     <br/><br/>
     <button type="submit" name="action" value="save">Conferma</button>
     <a th:href="@{/tournaments}">Annulla</a>
-
 </form>
 </body>
 </html>

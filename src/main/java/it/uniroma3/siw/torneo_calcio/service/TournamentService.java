@@ -8,6 +8,8 @@ import it.uniroma3.siw.torneo_calcio.standings.StandingRow;
 import it.uniroma3.siw.torneo_calcio.model.Tournament;
 import it.uniroma3.siw.torneo_calcio.repository.TournamentRepository;
 import it.uniroma3.siw.torneo_calcio.standings.StandingRowComparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +31,35 @@ public class TournamentService {
         return this.tournamentRepository.findById(id);
     }
 
-    @Transactional(readOnly  = true)
-    public List<Tournament> findAll(){
-        return this.tournamentRepository.findAll();
+    /**
+     *
+     * METODO findAll() per testare le statistiche di
+     *
+     * @Transactional(readOnly = true)
+     *     public List<Tournament> findAll() {
+     *         long start = System.currentTimeMillis();
+     *         List<Tournament> result = tournamentRepository.findAll();
+     *         // forza il caricamento delle squadre (altrimenti LAZY non le carica)
+     *         result.forEach(t -> t.getTeams().size());
+     *         long end = System.currentTimeMillis();
+     *         log.debug(">>> LAZY FETCH STRATEGY: - tempo: {}ms, tornei: {}", end - start, result.size());
+     *         return result;
+     *     }
+     */
+
+    private static final Logger log = LoggerFactory.getLogger(TournamentService.class);
+
+    /**
+     * Un semplice findAll() che mostra anche le statistiche (utile per confrontare le statistiche)
+     */
+    @Transactional(readOnly = true)
+    public List<Tournament> findAll() {
+        long start = System.currentTimeMillis();
+        List<Tournament> result = tournamentRepository.findAllWithTeams();
+        result.forEach(t -> t.getTeams().size());
+        long end = System.currentTimeMillis();
+        log.debug(">>> JOIN FETCH STRATEGY: - tempo: {}ms, tornei: {}", end - start, result.size());
+        return result;
     }
 
 
@@ -79,6 +107,7 @@ public class TournamentService {
         esistente.setYear(dati.getYear());
         esistente.setDescription(dati.getDescription());
         esistente.setTeams(dati.getTeams());
+        if (dati.getImageUrl() != null) esistente.setImageUrl(dati.getImageUrl());
         tournamentRepository.save(esistente);
     }
 

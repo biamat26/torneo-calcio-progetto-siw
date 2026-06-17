@@ -11,18 +11,17 @@
 
 <h1>Nuovo Giocatore</h1>
 
-<form th:action="@{/admin/players}" th:object="${player}" method="POST">
+<form th:action="@{/admin/players}" th:object="${player}" method="POST"
+      enctype="multipart/form-data">
     <div>
         <label>Nome:</label>
         <input type="text" th:field="*{name}" />
-        <span th:if="${#fields.hasErrors('name')}"
-              th:errors="*{name}" style="color:red"></span>
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></span>
     </div>
     <div>
         <label>Cognome:</label>
         <input type="text" th:field="*{surname}" />
-        <span th:if="${#fields.hasErrors('surname')}"
-              th:errors="*{surname}" style="color:red"></span>
+        <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" style="color:red"></span>
     </div>
     <div>
         <label>Data di nascita:</label>
@@ -36,19 +35,19 @@
         <label>Ruolo:</label>
         <select th:field="*{role}">
             <option value="">-- Seleziona ruolo --</option>
-            <option th:each="r : ${roles}"
-                    th:value="${r}"
-                    th:text="${r}"></option>
+            <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
         </select>
     </div>
     <div>
         <label>Squadra:</label>
         <select name="teamId">
             <option value="">-- Nessuna squadra --</option>
-            <option th:each="team : ${teams}"
-                    th:value="${team.id}"
-                    th:text="${team.name}"></option>
+            <option th:each="team : ${teams}" th:value="${team.id}" th:text="${team.name}"></option>
         </select>
+    </div>
+    <div>
+        <label>Foto giocatore:</label>
+        <input type="file" name="photo" accept="image/*"/>
     </div>
     <br/>
     <button type="submit">Salva</button>
