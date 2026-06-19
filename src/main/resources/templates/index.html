@@ -42,6 +42,7 @@
 
         <div>
             <h2>Scopri con noi le prossime partite</h2>
+            <p th:text="'Numero di partite:' + ${number_of_results}"></p>
             <ul>
                 <li th:each="match : ${upcomingMatches}">
                     <span th:text="${match.dateTime}"></span>
