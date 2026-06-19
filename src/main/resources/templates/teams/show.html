@@ -45,9 +45,9 @@
         </li>
     </ul>
 
-    <sec:authorize access="hasAuthority('ADMIN')">
+    <span sec:authorize access="hasAuthority('ADMIN')">
         <a th:href="@{/admin/players/new}">+ Aggiungi giocatore</a>
-    </sec:authorize>
+    </span>
 
     </body>
 </html>

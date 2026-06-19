@@ -20,7 +20,6 @@ public class HomeController {
     @GetMapping("/")
     public String getHome(Model model) {
         model.addAttribute("lastResults", matchService.getLastResults());
-        model.addAttribute("number_of_results", matchService.getLastResults().size());
         model.addAttribute("tournaments", tournamentService.findAll());
         model.addAttribute("upcomingMatches", matchService.getUpcomingMatches());
         return "index";

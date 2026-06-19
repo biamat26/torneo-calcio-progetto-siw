@@ -50,10 +50,11 @@
     </li>
 </ul>
 
-<sec:authorize access="hasAuthority('ADMIN')">
-    <br/>
-    <a th:href="@{/admin/matches/new}">+ Registra nuova partita</a>
-</sec:authorize>
+<span sec:authorize="hasAuthority('ADMIN')">
+        <a th:href="@{/admin/matches/new}">+ Registra nuova partita</a>
+ </span>
+
+
 
 </body>
 </html>
