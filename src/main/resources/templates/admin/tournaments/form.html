@@ -49,34 +49,12 @@
         <input type="file" name="image" accept="image/*"/>
     </div>
 
-    <input type="hidden" th:each="t : *{teams}" th:name="teamIds" th:value="${t.id}" />
-
-    <h3>Squadre nel torneo</h3>
-    <p th:if="${#lists.isEmpty(tournament.teams)}">Nessuna squadra aggiunta.</p>
-    <ul>
-        <li th:each="t : *{teams}">
-            <span th:text="${t.name}"></span>
-            <input type="hidden" name="removeTeamId" th:value="${t.id}"/>
-            <button type="submit" name="action" value="removeTeam"
-                    th:onclick="|document.querySelector('input[name=teamId]').value=${t.id}|">
-                Rimuovi
-            </button>
-        </li>
-    </ul>
-
-    <h3>Aggiungi squadra</h3>
-    <select name="teamId">
-        <option value="0">-- Seleziona squadra --</option>
-        <option th:each="t : ${teams}"
-                th:value="${t.id}"
-                th:text="${t.name}"
-                th:unless="${tournament.teams.contains(t)}"></option>
-    </select>
-    <button type="submit" name="action" value="addTeam">Aggiungi</button>
-
-    <br/><br/>
-    <button type="submit" name="action" value="save">Conferma</button>
+    <br/>
+    <button type="submit">Conferma</button>
     <a th:href="@{/tournaments}">Annulla</a>
 </form>
+
+<p><em>Le squadre possono essere aggiunte dopo la creazione, dalla pagina di modifica del torneo.</em></p>
+
 </body>
 </html>

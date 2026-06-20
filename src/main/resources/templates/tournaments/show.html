@@ -1,52 +1,107 @@
 <!DOCTYPE html>
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title th:text="${tournament.name}">Torneo</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
 
-<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
-    <head>
-        <title>
-            Torneo
-        </title>
-    </head>
-
-    <body>
-
-    <header>
-    <nav>
-        <a th:href="@{/}">Home</a>
-        <a th:href="@{/tournaments}">Tornei</a>
-        <a th:href="@{/teams}">Squadre</a>
-        <a th:href="@{/matches}">Partite</a>
+<nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
+    <a th:href="@{/matches}">Partite</a>
+    <div class="nav-right">
         <span th:if="${userDetails}">
-                    <span th:text="${userDetails.username}"></span>
-                    <span sec:authorize="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/index}">Admin Dashboard</a>
-                    </span>
-                    <form th:action="@{/logout}" method = "POST">
-                        <button type="submit">Logout</button>
-                    </form>
-                </span>
-        <span th:unless="${userDetails}">
-                    <a th:href="@{/login}">Login</a>
-                    <a th:href="@{/register}">Registrati</a>
-                </span>
-    </nav>
-    </header>
-
-        <h1 th:text="${tournament.name}"></h1>
-
-        <h2>Dettagli torneo:</h2>
-        <span th:text="'Anno: ' + ${tournament.year}"></span>
-        <span th:text="'Descrizione: ' + ${tournament.description}"></span>
-
-        <a th:href="@{/tournaments/{id}/standings(id=${tournament.id})}">Classifica</a>
-        <a th:href="@{/tournaments/{id}/fixtures(id=${tournament.id})}">Calendario</a>
-
-        <span th:each="teams : ${tournament.teams}">
-            <a th:href="@{/teams/{id}(id=${teams.id})}" th:text="${teams.name}"></a>
+            <span class="nav-username" th:text="${userDetails.username}"></span>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+            </span>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-sm">Logout</button>
+            </form>
         </span>
+        <span th:unless="${userDetails}">
+            <a th:href="@{/login}" class="btn btn-sm btn-secondary">Accedi</a>
+            <a th:href="@{/register}" class="btn btn-sm btn-primary">Registrati</a>
+        </span>
+    </div>
+</nav>
 
+<div class="hero">
+    <div class="hero-content">
+        <h1 th:text="${tournament.name}">Nome Torneo</h1>
+        <p th:text="${tournament.description}">Descrizione del torneo.</p>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a th:href="@{/tournaments/{id}/standings(id=${tournament.id})}" class="btn-hero">Classifica</a>
+            <a th:href="@{/tournaments/{id}/fixtures(id=${tournament.id})}" class="btn-hero"
+               style="background: transparent; border: 1px solid rgba(255,255,255,0.4);">Calendario</a>
+        </div>
+    </div>
+</div>
 
+<div class="container">
 
+    <!-- Dettagli + immagine torneo affiancati -->
+    <div class="grid-2 mb-2" style="align-items: start;">
 
+        <div>
+            <div class="section-label">Dettagli</div>
+            <div class="card">
+                <p class="text-muted" style="margin-bottom: 0.5rem;">
+                    Anno: <strong th:text="${tournament.year}"></strong>
+                </p>
+                <p class="text-muted" style="margin-bottom: 1rem;">
+                    <strong th:text="${tournament.teams.size()}"></strong> squadre partecipanti
+                </p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <a th:href="@{/tournaments/{id}/fixtures(id=${tournament.id})}" class="btn btn-sm btn-secondary">Calendario</a>
+                    <a th:href="@{/tournaments/{id}/standings(id=${tournament.id})}" class="btn btn-sm btn-primary">Classifica</a>
+                    <sec:authorize access="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/tournaments/{id}/edit(id=${tournament.id})}" class="btn btn-sm btn-secondary">Modifica</a>
+                    </sec:authorize>
+                </div>
+            </div>
+        </div>
 
-    </body>
+        <!-- Immagine torneo: visibile solo se presente -->
+        <div th:if="${tournament.imageUrl != null}">
+            <div class="section-label">Immagine</div>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <img th:src="${tournament.imageUrl}"
+                     alt="Immagine torneo"
+                     style="width: 100%; height: 180px; object-fit: cover; display: block;" />
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Squadre -->
+    <div class="section-label mt-2">Squadre partecipanti</div>
+    <p th:if="${#lists.isEmpty(tournament.teams)}" class="text-muted">Nessuna squadra registrata.</p>
+
+    <div class="tournament-card-grid">
+        <div th:each="team : ${tournament.teams}" class="tournament-card">
+            <div class="tournament-card-img">
+                <img th:if="${team.logoUrl != null}"
+                     th:src="${team.logoUrl}"
+                     style="width: 100%; height: 100%; object-fit: contain; padding: 12px;" />
+                <span th:unless="${team.logoUrl != null}">👕</span>
+            </div>
+            <div class="tournament-card-body">
+                <div class="tournament-card-title">
+                    <a th:href="@{/teams/{id}(id=${team.id})}" th:text="${team.name}"></a>
+                </div>
+                <div class="tournament-card-meta" th:text="${team.city}"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
 </html>

@@ -57,6 +57,7 @@ public class TournamentController {
         if(optional.isEmpty()) return "redirect:/tournaments";
         model.addAttribute("tournament", optional.get());
         model.addAttribute("fixtures", this.tournamentService.getFixtures(id));
+        model.addAttribute("results", this.tournamentService.getResults(id));
         return "tournaments/fixtures";
     }
 
@@ -72,10 +73,7 @@ public class TournamentController {
 
     @GetMapping("/admin/tournaments/new")
     public String createForm(Model model){
-        Tournament tournament = new Tournament();
-        tournament.setTeams(new ArrayList<>());
-        model.addAttribute("tournament", tournament);
-        model.addAttribute("teams", teamService.findAll());
+        model.addAttribute("tournament", new Tournament());
         return "admin/tournaments/form";
     }
 
@@ -83,49 +81,19 @@ public class TournamentController {
     public String save(@Valid @ModelAttribute("tournament") Tournament tournament,
                        BindingResult bindingResult,
                        Model model,
-                       @RequestParam(required = false) String action,
-                       @RequestParam(required = false) Long teamId,
-                       @RequestParam(required = false) List<Long> teamIds,
                        @RequestParam(required = false) MultipartFile image){
 
-        List<Team> teams = new ArrayList<>();
-        if (teamIds != null){
-            for(Long id : teamIds){
-                teamService.findById(id).ifPresent(teams::add);
-            }
-        }
-        tournament.setTeams(teams);
-
-        if("addTeam".equals(action)){
-            if(teamId != null && teamId > 0){
-                teamService.findById(teamId).ifPresent(t -> {
-                    if(!tournament.getTeams().contains(t))
-                        tournament.getTeams().add(t);
-                });
-            }
-            model.addAttribute("teams", teamService.findAll());
-            return "admin/tournaments/form";
-        }
-
-        if("removeTeam".equals(action)){
-            if(teamId != null && teamId > 0){
-                tournament.getTeams().removeIf(t -> t.getId().equals(teamId));
-            }
-            model.addAttribute("teams", teamService.findAll());
-            return "admin/tournaments/form";
-        }
-
         if(!bindingResult.hasErrors()){
+            tournament.setTeams(new ArrayList<>());
             try {
                 String imageUrl = fileUploadService.save(image, "tournaments");
                 if (imageUrl != null) tournament.setImageUrl(imageUrl);
             } catch (IOException e) {
                 log.error("Errore upload immagine torneo: {}", e.getMessage());
             }
-            tournamentService.save(tournament);
-            return "redirect:/tournaments";
+            Tournament saved = tournamentService.save(tournament);
+            return "redirect:/admin/tournaments/" + saved.getId() + "/edit";
         }
-        model.addAttribute("teams", teamService.findAll());
         return "admin/tournaments/form";
     }
 

@@ -1,55 +1,125 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Calendario Torneo</title>
+    <title th:text="'Calendario — ' + ${tournament.name}">Calendario</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
+
 <nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
     <a th:href="@{/}">Home</a>
     <a th:href="@{/tournaments}">Tornei</a>
     <a th:href="@{/teams}">Squadre</a>
-    <span th:if="${userDetails}">
-        <span th:text="${userDetails.username}"></span>
-        <span sec:authorize="hasAuthority('ADMIN')">
-            <a th:href="@{/admin/index}">Admin Dashboard</a>
-        </span>
-        <form th:action="@{/logout}" method="POST">
-            <button type="submit">Logout</button>
-        </form>
-    </span>
-    <span th:unless="${userDetails}">
-        <a th:href="@{/login}">Login</a>
-        <a th:href="@{/register}">Registrati</a>
-    </span>
-</nav>
-
-<h1 th:text="'Calendario ' + ${tournament.name}"></h1>
-
-<sec:authorize access="hasAuthority('ADMIN')">
-    <a th:href="@{/admin/matches/new}">+ Registra nuova partita</a>
-</sec:authorize>
-
-<ol>
-    <li th:each="match : ${fixtures}">
-        <a th:href="@{/matches/{id}(id=${match.id})}"
-           th:text="${match.homeTeam.name} + ' vs '
-                   + ${match.awayTeam.name} + ' - '
-                   + ${match.dateTime}"></a>
-        <span sec:authorize="hasAuthority('ADMIN')">
-            <a th:href="@{/admin/matches/{id}/result(id=${match.id})}">
-                Inserisci risultato
-            </a>
-            <form th:action="@{/admin/matches/{id}/delete(id=${match.id})}"
-                  method="POST" style="display:inline">
-                <button type="submit"
-                        onclick="return confirm('Eliminare questa partita?')">
-                    Elimina
-                </button>
+    <a th:href="@{/players}">Giocatori</a>
+    <a th:href="@{/matches}">Partite</a>
+    <div class="nav-right">
+        <span th:if="${userDetails}">
+            <span class="nav-username" th:text="${userDetails.username}"></span>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+            </span>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-sm">Logout</button>
             </form>
         </span>
-    </li>
-</ol>
+        <span th:unless="${userDetails}">
+            <a th:href="@{/login}" class="btn btn-sm btn-secondary">Accedi</a>
+            <a th:href="@{/register}" class="btn btn-sm btn-primary">Registrati</a>
+        </span>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="flex justify-between mb-2">
+        <div>
+            <a th:href="@{/tournaments/{id}(id=${tournament.id})}"
+               class="text-muted" style="font-size: 12px;">← Torna al torneo</a>
+            <h1 style="margin-top: 0.25rem;" th:text="'Calendario — ' + ${tournament.name}"></h1>
+        </div>
+        <sec:authorize access="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/matches/new}" class="btn btn-primary">+ Nuova partita</a>
+        </sec:authorize>
+    </div>
+
+    <!-- Partite programmate -->
+    <div class="section-label">Prossime partite</div>
+    <div class="card" style="padding: 0;">
+        <p th:if="${#lists.isEmpty(fixtures)}"
+           class="text-muted" style="padding: 1rem 1.25rem;">Nessuna partita in programma.</p>
+        <div th:each="match : ${fixtures}" class="match-row" style="padding: 10px 1.25rem;">
+            <div style="flex: 1;">
+                <div class="match-teams">
+                    <a th:href="@{/matches/{id}(id=${match.id})}">
+                        <span th:text="${match.homeTeam.name}"></span>
+                        vs
+                        <span th:text="${match.awayTeam.name}"></span>
+                    </a>
+                </div>
+                <div class="match-meta">
+                    <span th:text="${#temporals.format(match.dateTime, 'dd/MM/yyyy HH:mm')}"></span>
+                    · <span th:text="${match.local}"></span>
+                    <span th:if="${match.referee != null}">
+                        · Arbitro: <span th:text="${match.referee.name + ' ' + match.referee.surname}"></span>
+                    </span>
+                </div>
+            </div>
+            <span class="badge badge-gray">Programmata</span>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/matches/{id}/result(id=${match.id})}"
+                   class="btn btn-sm btn-secondary">Risultato</a>
+                <form th:action="@{/admin/matches/{id}/delete(id=${match.id})}"
+                      method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Eliminare questa partita?')">Elimina</button>
+                </form>
+            </span>
+        </div>
+    </div>
+
+    <!-- Risultati -->
+    <div class="section-label mt-2">Risultati</div>
+    <div class="card" style="padding: 0;">
+        <p th:if="${#lists.isEmpty(results)}"
+           class="text-muted" style="padding: 1rem 1.25rem;">Nessuna partita giocata ancora.</p>
+        <div th:each="match : ${results}" class="match-row" style="padding: 10px 1.25rem;">
+            <div style="flex: 1;">
+                <div class="match-teams">
+                    <a th:href="@{/matches/{id}(id=${match.id})}">
+                        <span th:text="${match.homeTeam.name}"></span>
+                        vs
+                        <span th:text="${match.awayTeam.name}"></span>
+                    </a>
+                </div>
+                <div class="match-meta">
+                    <span th:text="${#temporals.format(match.dateTime, 'dd/MM/yyyy HH:mm')}"></span>
+                    · <span th:text="${match.local}"></span>
+                    <span th:if="${match.referee != null}">
+                        · Arbitro: <span th:text="${match.referee.name + ' ' + match.referee.surname}"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="match-score">
+                <span th:text="${match.goalsHome}"></span>
+                –
+                <span th:text="${match.goalsAway}"></span>
+            </div>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/matches/{id}/result(id=${match.id})}"
+                   class="btn btn-sm btn-secondary">Modifica</a>
+                <form th:action="@{/admin/matches/{id}/delete(id=${match.id})}"
+                      method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Eliminare questa partita?')">Elimina</button>
+                </form>
+            </span>
+        </div>
+    </div>
+
+</div>
 
 </body>
 </html>

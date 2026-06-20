@@ -1,39 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Classifica</title>
-    <!-- React e Babel standalone — compilano JSX direttamente nel browser -->
+    <title th:text="'Classifica — ' + ${tournament.name}">Classifica</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
 </head>
 <body>
+
 <nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
     <a th:href="@{/}">Home</a>
     <a th:href="@{/tournaments}">Tornei</a>
     <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
     <a th:href="@{/matches}">Partite</a>
-    <span th:if="${userDetails}">
-        <span th:text="${userDetails.username}"></span>
-        <span sec:authorize="hasAuthority('ADMIN')">
-            <a th:href="@{/admin/index}">Admin Dashboard</a>
+    <div class="nav-right">
+        <span th:if="${userDetails}">
+            <span class="nav-username" th:text="${userDetails.username}"></span>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+            </span>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-sm">Logout</button>
+            </form>
         </span>
-        <form th:action="@{/logout}" method="POST">
-            <button type="submit">Logout</button>
-        </form>
-    </span>
-    <span th:unless="${userDetails}">
-        <a th:href="@{/login}">Login</a>
-        <a th:href="@{/register}">Registrati</a>
-    </span>
+        <span th:unless="${userDetails}">
+            <a th:href="@{/login}" class="btn btn-sm btn-secondary">Accedi</a>
+            <a th:href="@{/register}" class="btn btn-sm btn-primary">Registrati</a>
+        </span>
+    </div>
 </nav>
 
-<h1 th:text="'Classifica ' + ${tournament.name}"></h1>
+<div class="container">
 
-<!-- React monta qui -->
-<div id="root"
-     th:attr="data-tournament-id=${tournament.id}">
+    <a th:href="@{/tournaments/{id}(id=${tournament.id})}"
+       class="text-muted" style="font-size: 12px;">← Torna al torneo</a>
+    <h1 style="margin-top: 0.25rem;" th:text="'Classifica — ' + ${tournament.name}"></h1>
+
+    <div class="section-label">Classifica generale</div>
+
+    <div id="root" th:attr="data-tournament-id=${tournament.id}"></div>
+
 </div>
 
 <script type="text/babel" data-presets="react">
@@ -51,11 +62,21 @@
                 .then(data => {
                     setStandings(data);
                     setLoading(false);
-                });
+                })
+                .catch(() => setLoading(false));
         }, []);
 
-        if (loading) return <p>Caricamento classifica...</p>;
-        if (standings.length === 0) return <p>Nessuna partita giocata ancora.</p>;
+        if (loading) return <p className="text-muted">Caricamento classifica...</p>;
+        if (standings.length === 0) return <p className="text-muted">Nessuna partita giocata ancora.</p>;
+
+        const rankClass = (index) => {
+            if (index === 0) return "rank-gold";
+            if (index === 1) return "rank-silver";
+            if (index === 2) return "rank-bronze";
+            return "";
+        };
+
+        const dr = (val) => val > 0 ? "+" + val : val;
 
         return (
             <table>
@@ -63,29 +84,29 @@
                 <tr>
                     <th>#</th>
                     <th>Squadra</th>
-                    <th>P</th>
-                    <th>V</th>
-                    <th>N</th>
-                    <th>S</th>
-                    <th>GF</th>
-                    <th>GS</th>
-                    <th>DR</th>
-                    <th>Pts</th>
+                    <th title="Partite giocate">P</th>
+                    <th title="Vittorie">V</th>
+                    <th title="Pareggi">N</th>
+                    <th title="Sconfitte">S</th>
+                    <th title="Gol fatti">GF</th>
+                    <th title="Gol subiti">GS</th>
+                    <th title="Differenza reti">DR</th>
+                    <th title="Punti">Pts</th>
                 </tr>
                 </thead>
                 <tbody>
                 {standings.map((row, index) => (
-                    <tr key={index}>
+                    <tr key={index} className={rankClass(index)}>
                         <td>{index + 1}</td>
-                        <td>{row.teamName}</td>
+                        <td><strong>{row.teamName}</strong></td>
                         <td>{row.played}</td>
                         <td>{row.wins}</td>
                         <td>{row.draws}</td>
                         <td>{row.losses}</td>
                         <td>{row.goalsFor}</td>
                         <td>{row.goalsAgainst}</td>
-                        <td>{row.goalDifference}</td>
-                        <td>{row.points}</td>
+                        <td>{dr(row.goalDifference)}</td>
+                        <td><strong>{row.points}</strong></td>
                     </tr>
                 ))}
                 </tbody>
@@ -97,7 +118,5 @@
     root.render(<StandingsTable />);
 </script>
 
-<br/>
-<a th:href="@{/tournaments/{id}(id=${tournament.id})}">← Torna al torneo</a>
 </body>
 </html>
