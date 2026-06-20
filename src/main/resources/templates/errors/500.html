@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Errore del server — Tornei Calcio</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+
+<nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
+    <a th:href="@{/matches}">Partite</a>
+    <div class="nav-right">
+        <span th:if="${userDetails}">
+            <span class="nav-username" th:text="${userDetails.username}"></span>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+            </span>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-sm">Logout</button>
+            </form>
+        </span>
+        <span th:unless="${userDetails}">
+            <a th:href="@{/login}" class="btn btn-sm btn-secondary">Accedi</a>
+            <a th:href="@{/register}" class="btn btn-sm btn-primary">Registrati</a>
+        </span>
+    </div>
+</nav>
+
+<div class="container" style="text-align: center; padding-top: 4rem;">
+
+    <div style="font-size: 72px; margin-bottom: 1rem;">⚠️</div>
+
+    <h1 style="border: none; padding: 0; font-size: 28px; margin-bottom: 0.5rem;">
+        Qualcosa è andato storto
+    </h1>
+
+    <p class="text-muted" style="margin-bottom: 2rem;">
+        Si è verificato un errore interno. Riprova tra qualche istante.
+    </p>
+
+    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <a th:href="@{/}" class="btn btn-primary">Torna alla home</a>
+        <a th:href="@{/tournaments}" class="btn btn-secondary">Vedi i tornei</a>
+    </div>
+
+</div>
+
+</body>
+</html>
