@@ -1,60 +1,99 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Partite</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
+
 <nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
     <a th:href="@{/}">Home</a>
     <a th:href="@{/tournaments}">Tornei</a>
     <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
     <a th:href="@{/matches}">Partite</a>
-    <span th:if="${userDetails}">
-        <span th:text="${userDetails.username}"></span>
-        <span sec:authorize="hasAuthority('ADMIN')">
-            <a th:href="@{/admin/index}">Admin Dashboard</a>
+    <div class="nav-right">
+        <span th:if="${userDetails}">
+            <span class="nav-username" th:text="${userDetails.username}"></span>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+            </span>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-sm">Logout</button>
+            </form>
         </span>
-        <form th:action="@{/logout}" method="POST">
-            <button type="submit">Logout</button>
-        </form>
-    </span>
-    <span th:unless="${userDetails}">
-        <a th:href="@{/login}">Login</a>
-        <a th:href="@{/register}">Registrati</a>
-    </span>
+        <span th:unless="${userDetails}">
+            <a th:href="@{/login}" class="btn btn-sm btn-secondary">Accedi</a>
+            <a th:href="@{/register}" class="btn btn-sm btn-primary">Registrati</a>
+        </span>
+    </div>
 </nav>
 
-<h1>Partite</h1>
+<div class="container">
 
-<h2>Ultimi risultati</h2>
-<p th:if="${#lists.isEmpty(lastResults)}">Nessun risultato disponibile.</p>
-<ul>
-    <li th:each="match : ${lastResults}">
-        <a th:href="@{/matches/{id}(id=${match.id})}"
-           th:text="${match.homeTeam.name} + ' '
-                   + ${match.goalsHome} + ' - '
-                   + ${match.goalsAway} + ' '
-                   + ${match.awayTeam.name}"></a>
-        <small th:text="' | ' + ${match.tournament?.name} + ' | ' + ${match.dateTime}"></small>
-    </li>
-</ul>
+    <div class="flex justify-between mb-2">
+        <h1 style="margin-bottom: 0;">Partite</h1>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/matches/new}" class="btn btn-primary">+ Registra partita</a>
+        </span>
+    </div>
 
-<h2>Prossime partite</h2>
-<p th:if="${#lists.isEmpty(upcomingMatches)}">Nessuna partita in programma.</p>
-<ul>
-    <li th:each="match : ${upcomingMatches}">
-        <a th:href="@{/matches/{id}(id=${match.id})}"
-           th:text="${match.homeTeam.name} + ' vs ' + ${match.awayTeam.name}"></a>
-        <small th:text="' | ' + ${match.tournament?.name} + ' | ' + ${match.dateTime}"></small>
-    </li>
-</ul>
+    <!-- Prossime partite -->
+    <div class="section-label">Prossime partite</div>
+    <div class="card" style="padding: 0;">
+        <p th:if="${#lists.isEmpty(upcomingMatches)}"
+           class="text-muted" style="padding: 1rem 1.25rem;">Nessuna partita in programma.</p>
+        <div th:each="match : ${upcomingMatches}" class="match-row" style="padding: 10px 1.25rem;">
+            <div style="flex: 1;">
+                <div class="match-teams">
+                    <a th:href="@{/matches/{id}(id=${match.id})}">
+                        <span th:text="${match.homeTeam.name}"></span>
+                        vs
+                        <span th:text="${match.awayTeam.name}"></span>
+                    </a>
+                </div>
+                <div class="match-meta">
+                    <span th:text="${match.tournament?.name}"></span>
+                    ·
+                    <span th:text="${#temporals.format(match.dateTime, 'dd/MM/yyyy HH:mm')}"></span>
+                </div>
+            </div>
+            <span class="badge badge-gray">Programmata</span>
+        </div>
+    </div>
 
-<span sec:authorize="hasAuthority('ADMIN')">
-        <a th:href="@{/admin/matches/new}">+ Registra nuova partita</a>
- </span>
+    <!-- Ultimi risultati -->
+    <div class="section-label mt-2">Ultimi risultati</div>
+    <div class="card" style="padding: 0;">
+        <p th:if="${#lists.isEmpty(lastResults)}"
+           class="text-muted" style="padding: 1rem 1.25rem;">Nessun risultato disponibile.</p>
+        <div th:each="match : ${lastResults}" class="match-row" style="padding: 10px 1.25rem;">
+            <div style="flex: 1;">
+                <div class="match-teams">
+                    <a th:href="@{/matches/{id}(id=${match.id})}">
+                        <span th:text="${match.homeTeam.name}"></span>
+                        vs
+                        <span th:text="${match.awayTeam.name}"></span>
+                    </a>
+                </div>
+                <div class="match-meta">
+                    <span th:text="${match.tournament?.name}"></span>
+                    ·
+                    <span th:text="${#temporals.format(match.dateTime, 'dd/MM/yyyy HH:mm')}"></span>
+                </div>
+            </div>
+            <div class="match-score">
+                <span th:text="${match.goalsHome}"></span>
+                –
+                <span th:text="${match.goalsAway}"></span>
+            </div>
+        </div>
+    </div>
 
-
+</div>
 
 </body>
 </html>

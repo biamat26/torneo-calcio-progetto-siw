@@ -1,60 +1,57 @@
 <!DOCTYPE html>
-<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
-  <head>
-    <title>
-      Torneo Calcio - Login
-    </title>
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Login — Tornei Calcio</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
 
-  </head>
-
-  <body>
-
-
-  <nav>
+<nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
     <a th:href="@{/}">Home</a>
     <a th:href="@{/tournaments}">Tornei</a>
     <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
     <a th:href="@{/matches}">Partite</a>
-    <span th:if="${userDetails}">
-                    <span th:text="${userDetails.username}"></span>
-                    <span sec:authorize="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/index}">Admin Dashboard</a>
-                    </span>
-                    <form th:action="@{/logout}" method = "POST">
-                        <button type="submit">Logout</button>
-                    </form>
-                </span>
-    <span th:unless="${userDetails}">
-                    <a th:href="@{/login}">Login</a>
-                    <a th:href="@{/register}">Registrati</a>
-                </span>
-  </nav>
-  </header>
+    <div class="nav-right">
+        <a th:href="@{/login}" class="btn btn-sm btn-secondary">Accedi</a>
+        <a th:href="@{/register}" class="btn btn-sm btn-primary">Registrati</a>
+    </div>
+</nav>
 
-    <h1>Login</h1>
-    <form th:action="@{/login}" method = "POST">
-      <div>
-        <span>Username</span>
-        <span><input name ="username" type = "text" required/></span>
-      </div>
+<div class="container" style="max-width: 420px; padding-top: 3rem;">
 
-      <div>
-        <span>Password</span>
-        <span><input name ="password" type="password" required/></span>
-      </div>
+    <h1 style="margin-bottom: 0.25rem;">Accedi</h1>
+    <p class="text-muted" style="margin-bottom: 1.5rem;">Bentornato su Tornei Calcio.</p>
 
-      <div>
-        <span th:if="${param.error != null}">Username o password errati</span>
-      </div>
-      <div>
-        <span><button type="submit">Login</button></span>
-      </div>
-    </form>
+    <div th:if="${param.error != null}" class="alert alert-error" style="margin-bottom: 1rem;">
+        Username o password errati. Riprova.
+    </div>
 
-  <div>
-    <a th:href="@{/register}">Registrati</a>
-  </div>
+    <div class="card">
+        <form th:action="@{/login}" method="POST">
+            <div>
+                <label>Username</label>
+                <input name="username" type="text" required autocomplete="username" />
+            </div>
+            <div>
+                <label>Password</label>
+                <input name="password" type="password" required autocomplete="current-password" />
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Accedi</button>
+            </div>
+        </form>
+    </div>
 
-  </body>
+    <p class="text-muted" style="text-align: center; margin-top: 1rem;">
+        Non hai un account?
+        <a th:href="@{/register}">Registrati</a>
+    </p>
 
+</div>
+
+</body>
 </html>

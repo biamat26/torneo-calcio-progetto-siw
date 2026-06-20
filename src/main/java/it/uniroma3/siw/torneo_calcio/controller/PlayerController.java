@@ -31,6 +31,12 @@ public class PlayerController {
         this.fileUploadService = fileUploadService;
     }
 
+    @GetMapping("/players")
+    public String list(Model model) {
+        model.addAttribute("players", playerService.findAll());
+        return "players/list";
+    }
+
     @GetMapping("/players/{id}")
     public String show(@PathVariable Long id, Model model) {
         Optional<Player> optional = playerService.findById(id);

@@ -1,53 +1,106 @@
 <!DOCTYPE html>
-
-<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Squadra</title>
+    <title th:text="${team.name}">Squadra</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
+<body>
 
-    <body>
-    <nav>
-        <a th:href="@{/}">Home</a>
-        <a th:href="@{/tournaments}">Tornei</a>
-        <a th:href="@{/teams}">Squadre</a>
-        <a th:href="@{/matches}">Partite</a>
+<nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
+    <a th:href="@{/matches}">Partite</a>
+    <div class="nav-right">
         <span th:if="${userDetails}">
-                    <span th:text="${userDetails.username}"></span>
-                    <span sec:authorize="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/index}">Admin Dashboard</a>
-                    </span>
-                    <form th:action="@{/logout}" method = "POST">
-                        <button type="submit">Logout</button>
+            <span class="nav-username" th:text="${userDetails.username}"></span>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+            </span>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-sm">Logout</button>
+            </form>
+        </span>
+        <span th:unless="${userDetails}">
+            <a th:href="@{/login}" class="btn btn-sm btn-secondary">Accedi</a>
+            <a th:href="@{/register}" class="btn btn-sm btn-primary">Registrati</a>
+        </span>
+    </div>
+</nav>
+
+<div class="container">
+
+    <a th:href="@{/teams}" class="text-muted" style="font-size: 12px;">← Tutte le squadre</a>
+
+    <!-- Header squadra -->
+    <div class="flex mt-2 mb-2" style="align-items: center; gap: 1.25rem;">
+        <div style="width: 72px; height: 72px; background: #e8f5ec; border-radius: 10px;
+                    border: 0.5px solid rgba(0,0,0,0.1); display: flex; align-items: center;
+                    justify-content: center; font-size: 36px; overflow: hidden; flex-shrink: 0;">
+            <img th:if="${team.logoUrl != null}" th:src="${team.logoUrl}"
+                 style="width: 100%; height: 100%; object-fit: contain; padding: 8px;" />
+            <span th:unless="${team.logoUrl != null}">👕</span>
+        </div>
+        <div>
+            <h1 style="margin-bottom: 0.15rem;" th:text="${team.name}"></h1>
+            <span class="text-muted">
+                <span th:text="${team.city}"></span>
+                · Est. <span th:text="${team.foundationYear}"></span>
+            </span>
+        </div>
+        <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+            <span sec:authorize ="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/teams/{id}/edit(id=${team.id})}"
+                   class="btn btn-sm btn-secondary">Modifica squadra</a>
+            </span>
+        </div>
+    </div>
+
+    <!-- Rosa giocatori -->
+    <div class="flex justify-between mb-1">
+        <div class="section-label" style="margin-bottom: 0;">Rosa</div>
+        <span sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/players/new}" class="btn btn-sm btn-primary">+ Aggiungi giocatore</a>
+        </span>
+    </div>
+
+    <div class="card" style="padding: 0;">
+        <p th:if="${#lists.isEmpty(team.players)}"
+           class="text-muted" style="padding: 1rem 1.25rem;">Nessun giocatore registrato.</p>
+
+        <div th:each="player : ${team.players}" class="entity-row" style="padding: 10px 1.25rem;">
+            <div class="entity-avatar round">
+                <img th:if="${player.photoUrl != null}" th:src="${player.photoUrl}" />
+                <span th:unless="${player.photoUrl != null}">👤</span>
+            </div>
+            <div>
+                <div class="entity-name">
+                    <a th:href="@{/players/{id}(id=${player.id})}"
+                       th:text="${player.name} + ' ' + ${player.surname}"></a>
+                </div>
+                <div class="entity-sub">
+                    <span class="badge" th:text="${player.role}"></span>
+                </div>
+            </div>
+            <div class="entity-actions">
+                <span sec:authorize="hasAuthority('ADMIN')">
+                    <a th:href="@{/admin/players/{id}/edit(id=${player.id})}"
+                       class="btn btn-sm btn-secondary">Modifica</a>
+                    <form th:action="@{/admin/players/{id}/delete(id=${player.id})}"
+                          method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Eliminare il giocatore?')">Elimina</button>
                     </form>
                 </span>
-        <span th:unless="${userDetails}">
-                    <a th:href="@{/login}">Login</a>
-                    <a th:href="@{/register}">Registrati</a>
-                </span>
-    </nav>
-    <h1 th:text="${team.name}"></h1>
-    <p th:text="'Anno fondazione: ' + ${team.foundationYear}"></p>
-    <p th:text="'Città: ' + ${team.city}"></p>
+            </div>
+        </div>
+    </div>
 
-    <h2>Giocatori</h2>
-    <ul>
-        <li th:each="player : ${team.players}">
-            <a th:href="@{/players/{id}(id=${player.id})}"
-               th:text="${player.name} + ' ' + ${player.surname} + ' - ' + ${player.role}"></a>
-            <span sec:authorize="hasAuthority('ADMIN')">
-                <a th:href="@{/admin/players/{id}/edit(id=${player.id})}">Modifica</a>
-                <form th:action="@{/admin/players/{id}/delete(id=${player.id})}"
-                      method="POST" style="display:inline">
-                    <button type="submit"
-                            onclick="return confirm('Eliminare il giocatore?')">Elimina</button>
-                </form>
-            </span>
-        </li>
-    </ul>
+</div>
 
-    <span sec:authorize access="hasAuthority('ADMIN')">
-        <a th:href="@{/admin/players/new}">+ Aggiungi giocatore</a>
-    </span>
-
-    </body>
+</body>
 </html>

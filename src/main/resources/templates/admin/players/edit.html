@@ -1,76 +1,109 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Modifica Giocatore</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
+
 <nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
     <a th:href="@{/}">Home</a>
-    <a th:href="@{/admin/index}">Admin Dashboard</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
+    <a th:href="@{/matches}">Partite</a>
+    <div class="nav-right">
+        <span class="nav-username" th:text="${userDetails?.username}"></span>
+        <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit" class="btn btn-sm">Logout</button>
+        </form>
+    </div>
 </nav>
 
-<h1>Modifica Giocatore</h1>
+<div class="container" style="max-width: 600px;">
 
-<!-- Form separato per la foto -->
-<div>
-    <h3>Foto giocatore</h3>
-    <img th:if="${player.photoUrl != null}"
-         th:src="${player.photoUrl}"
-         alt="Foto giocatore"
-         style="width:100px; height:100px; object-fit:cover; border-radius:50%; display:block; margin-bottom:0.5rem;"/>
-    <form th:if="${player.photoUrl == null}"
-          th:action="@{/admin/players/{id}/image(id=${player.id})}"
-          method="POST" enctype="multipart/form-data">
-        <input type="file" name="photo" accept="image/*"/>
-        <button type="submit">Carica foto</button>
-    </form>
-    <form th:if="${player.photoUrl != null}"
-          th:action="@{/admin/players/{id}/image/delete(id=${player.id})}"
-          method="POST" style="display:inline">
-        <button type="submit" onclick="return confirm('Rimuovere la foto?')">Rimuovi la foto</button>
-    </form>
+    <a th:if="${player.team != null}"
+       th:href="@{/teams/{id}(id=${player.team.id})}"
+       class="text-muted" style="font-size: 12px;">← Torna alla squadra</a>
+    <a th:unless="${player.team != null}"
+       th:href="@{/players}"
+       class="text-muted" style="font-size: 12px;">← Torna ai giocatori</a>
+    <h1 style="margin-top: 0.25rem;">Modifica Giocatore</h1>
+
+    <!-- Foto -->
+    <div class="section-label">Foto</div>
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <img th:if="${player.photoUrl != null}" th:src="${player.photoUrl}"
+             class="img-preview round" style="margin-bottom: 0.75rem;" />
+        <form th:if="${player.photoUrl == null}"
+              th:action="@{/admin/players/{id}/image(id=${player.id})}"
+              method="POST" enctype="multipart/form-data">
+            <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                <input type="file" name="photo" accept="image/*" />
+                <button type="submit" class="btn btn-sm btn-secondary">Carica</button>
+            </div>
+        </form>
+        <form th:if="${player.photoUrl != null}"
+              th:action="@{/admin/players/{id}/image/delete(id=${player.id})}"
+              method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-danger"
+                    onclick="return confirm('Rimuovere la foto?')">Rimuovi foto</button>
+        </form>
+    </div>
+
+    <!-- Dati -->
+    <div class="card">
+        <form th:action="@{/admin/players/{id}(id=${player.id})}"
+              th:object="${player}" method="POST">
+            <div class="form-row">
+                <div>
+                    <label>Nome</label>
+                    <input type="text" th:field="*{name}" />
+                    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red;"></span>
+                </div>
+                <div>
+                    <label>Cognome</label>
+                    <input type="text" th:field="*{surname}" />
+                    <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" style="color:red;"></span>
+                </div>
+            </div>
+            <div>
+                <label>Data di nascita</label>
+                <input type="date" th:field="*{birth_date}" />
+            </div>
+            <div>
+                <label>Altezza (cm)</label>
+                <input type="number" th:field="*{height}" min="100" max="230" />
+            </div>
+            <div>
+                <label>Ruolo</label>
+                <select th:field="*{role}">
+                    <option value="">-- Seleziona ruolo --</option>
+                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+                </select>
+            </div>
+            <div>
+                <label>Squadra</label>
+                <select name="teamId">
+                    <option value="">-- Nessuna squadra --</option>
+                    <option th:each="team : ${teams}"
+                            th:value="${team.id}"
+                            th:selected="${player.team != null && player.team.id == team.id}"
+                            th:text="${team.name}"></option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Salva modifiche</button>
+                <a th:href="@{/players}" class="btn btn-secondary">Annulla</a>
+            </div>
+        </form>
+    </div>
+
 </div>
 
-<form th:action="@{/admin/players/{id}(id=${player.id})}"
-      th:object="${player}" method="POST">
-    <div>
-        <label>Nome:</label>
-        <input type="text" th:field="*{name}" />
-        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></span>
-    </div>
-    <div>
-        <label>Cognome:</label>
-        <input type="text" th:field="*{surname}" />
-        <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" style="color:red"></span>
-    </div>
-    <div>
-        <label>Data di nascita:</label>
-        <input type="date" th:field="*{birth_date}" />
-    </div>
-    <div>
-        <label>Altezza (cm):</label>
-        <input type="number" th:field="*{height}" min="100" max="230" />
-    </div>
-    <div>
-        <label>Ruolo:</label>
-        <select th:field="*{role}">
-            <option value="">-- Seleziona ruolo --</option>
-            <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
-        </select>
-    </div>
-    <div>
-        <label>Squadra:</label>
-        <select name="teamId">
-            <option value="">-- Nessuna squadra --</option>
-            <option th:each="team : ${teams}"
-                    th:value="${team.id}"
-                    th:selected="${player.team != null && player.team.id == team.id}"
-                    th:text="${team.name}"></option>
-        </select>
-    </div>
-    <br/>
-    <button type="submit">Salva modifiche</button>
-    <a th:href="@{/teams}">Annulla</a>
-</form>
 </body>
 </html>

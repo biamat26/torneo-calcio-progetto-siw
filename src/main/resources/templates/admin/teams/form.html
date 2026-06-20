@@ -1,53 +1,62 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Crea Nuova Squadra</title>
+    <title>Nuova Squadra</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
+
 <nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
     <a th:href="@{/}">Home</a>
     <a th:href="@{/tournaments}">Tornei</a>
     <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
     <a th:href="@{/matches}">Partite</a>
-    <span th:if="${userDetails}">
-        <span th:text="${userDetails.username}"></span>
-        <span sec:authorize="hasAuthority('ADMIN')">
-            <a th:href="@{/admin/index}">Admin Dashboard</a>
-        </span>
+    <div class="nav-right">
+        <span class="nav-username" th:text="${userDetails?.username}"></span>
+        <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
         <form th:action="@{/logout}" method="POST">
-            <button type="submit">Logout</button>
+            <button type="submit" class="btn btn-sm">Logout</button>
         </form>
-    </span>
-    <span th:unless="${userDetails}">
-        <a th:href="@{/login}">Login</a>
-        <a th:href="@{/register}">Registrati</a>
-    </span>
+    </div>
 </nav>
 
-<h1>Crea Nuova Squadra</h1>
+<div class="container" style="max-width: 600px;">
 
-<form th:action="@{/admin/teams}" method="POST" th:object="${team}"
-      enctype="multipart/form-data">
-    <div>
-        <label>Nome:</label>
-        <input type="text" th:field="*{name}"/>
-        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+    <a th:href="@{/teams}" class="text-muted" style="font-size: 12px;">← Torna alle squadre</a>
+    <h1 style="margin-top: 0.25rem;">Nuova Squadra</h1>
+
+    <div class="card">
+        <form th:action="@{/admin/teams}" method="POST"
+              th:object="${team}" enctype="multipart/form-data">
+            <div>
+                <label>Nome</label>
+                <input type="text" th:field="*{name}" placeholder="Es. FC Roma" />
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red;"></span>
+            </div>
+            <div>
+                <label>Anno fondazione</label>
+                <input type="text" th:field="*{foundationYear}" placeholder="Es. 1927" />
+            </div>
+            <div>
+                <label>Città</label>
+                <input type="text" th:field="*{city}" placeholder="Es. Roma" />
+            </div>
+            <div>
+                <label>Logo squadra</label>
+                <input type="file" name="logo" accept="image/*" />
+            </div>
+            <div class="form-actions">
+                <button type="submit" name="action" value="save" class="btn btn-primary">Crea squadra</button>
+                <a th:href="@{/teams}" class="btn btn-secondary">Annulla</a>
+            </div>
+        </form>
     </div>
-    <div>
-        <label>Anno fondazione:</label>
-        <input type="text" th:field="*{foundationYear}"/>
-    </div>
-    <div>
-        <label>Città:</label>
-        <input type="text" th:field="*{city}"/>
-    </div>
-    <div>
-        <label>Logo squadra:</label>
-        <input type="file" name="logo" accept="image/*"/>
-    </div>
-    <button type="submit" name="action" value="save">Conferma</button>
-    <a th:href="@{/teams}">Annulla</a>
-</form>
+
+</div>
+
 </body>
 </html>

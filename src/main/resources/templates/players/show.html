@@ -1,48 +1,109 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Giocatore</title>
+    <title th:text="${player.name} + ' ' + ${player.surname}">Giocatore</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
+
 <nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
     <a th:href="@{/}">Home</a>
     <a th:href="@{/tournaments}">Tornei</a>
     <a th:href="@{/teams}">Squadre</a>
-    <span th:if="${userDetails}">
-        <span th:text="${userDetails.username}"></span>
-        <span sec:authorize="hasAuthority('ADMIN')">
-            <a th:href="@{/admin/index}">Admin Dashboard</a>
+    <a th:href="@{/players}">Giocatori</a>
+    <a th:href="@{/matches}">Partite</a>
+    <div class="nav-right">
+        <span th:if="${userDetails}">
+            <span class="nav-username" th:text="${userDetails.username}"></span>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+            </span>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-sm">Logout</button>
+            </form>
         </span>
-        <form th:action="@{/logout}" method="POST">
-            <button type="submit">Logout</button>
-        </form>
-    </span>
-    <span th:unless="${userDetails}">
-        <a th:href="@{/login}">Login</a>
-        <a th:href="@{/register}">Registrati</a>
-    </span>
+        <span th:unless="${userDetails}">
+            <a th:href="@{/login}" class="btn btn-sm btn-secondary">Accedi</a>
+            <a th:href="@{/register}" class="btn btn-sm btn-primary">Registrati</a>
+        </span>
+    </div>
 </nav>
 
-<h1 th:text="${player.name} + ' ' + ${player.surname}"></h1>
-<p th:text="'Data di nascita: ' + ${player.birth_date}"></p>
-<p th:text="'Ruolo: ' + ${player.role}"></p>
-<p th:text="'Altezza: ' + ${player.height} + ' cm'"></p>
-<p th:if="${player.team != null}">
-    Squadra: <a th:href="@{/teams/{id}(id=${player.team.id})}"
-                th:text="${player.team.name}"></a>
-</p>
+<div class="container">
 
-<span sec:authorize access="hasAuthority('ADMIN')">
-    <a th:href="@{/admin/players/{id}/edit(id=${player.id})}">Modifica</a>
-    <form th:action="@{/admin/players/{id}/delete(id=${player.id})}"
-          method="POST" style="display:inline">
-        <button type="submit"
-                onclick="return confirm('Eliminare il giocatore?')">Elimina</button>
-    </form>
-</span>
+    <a th:if="${player.team != null}"
+       th:href="@{/teams/{id}(id=${player.team.id})}"
+       class="text-muted" style="font-size: 12px;">← Torna alla squadra</a>
+    <a th:unless="${player.team != null}"
+       th:href="@{/teams}"
+       class="text-muted" style="font-size: 12px;">← Tutte le squadre</a>
 
-<br/>
-<a th:href="@{/teams}">← Torna alle squadre</a>
+    <!-- Header giocatore -->
+    <div class="flex mt-2 mb-2" style="align-items: center; gap: 1.25rem;">
+        <div class="entity-avatar round"
+             style="width: 72px; height: 72px; font-size: 36px; flex-shrink: 0;">
+            <img th:if="${player.photoUrl != null}" th:src="${player.photoUrl}" />
+            <span th:unless="${player.photoUrl != null}">👤</span>
+        </div>
+        <div>
+            <h1 style="margin-bottom: 0.15rem;"
+                th:text="${player.name} + ' ' + ${player.surname}"></h1>
+            <span class="badge" th:text="${player.role}"></span>
+            <span th:if="${player.team != null}" class="text-muted" style="margin-left: 0.5rem; font-size: 13px;">
+                · <a th:href="@{/teams/{id}(id=${player.team.id})}"
+                     th:text="${player.team.name}"></a>
+            </span>
+        </div>
+        <div style="margin-left: auto;">
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/players/{id}/edit(id=${player.id})}"
+                   class="btn btn-sm btn-secondary">Modifica</a>
+                <form th:action="@{/admin/players/{id}/delete(id=${player.id})}"
+                      method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Eliminare il giocatore?')">Elimina</button>
+                </form>
+            </span>
+        </div>
+    </div>
+
+    <!-- Dettagli -->
+    <div class="section-label">Dettagli</div>
+    <div class="card">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
+            <div>
+                <div class="text-muted" style="font-size: 11px; text-transform: uppercase;
+                     letter-spacing: 0.08em; margin-bottom: 4px;">Data di nascita</div>
+                <div style="font-size: 14px; font-weight: 500;"
+                     th:text="${player.birth_date}"></div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size: 11px; text-transform: uppercase;
+                     letter-spacing: 0.08em; margin-bottom: 4px;">Altezza</div>
+                <div style="font-size: 14px; font-weight: 500;"
+                     th:text="${player.height} + ' cm'"></div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size: 11px; text-transform: uppercase;
+                     letter-spacing: 0.08em; margin-bottom: 4px;">Ruolo</div>
+                <div style="font-size: 14px; font-weight: 500;"
+                     th:text="${player.role}"></div>
+            </div>
+            <div th:if="${player.team != null}">
+                <div class="text-muted" style="font-size: 11px; text-transform: uppercase;
+                     letter-spacing: 0.08em; margin-bottom: 4px;">Squadra</div>
+                <div style="font-size: 14px; font-weight: 500;">
+                    <a th:href="@{/teams/{id}(id=${player.team.id})}"
+                       th:text="${player.team.name}"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 </body>
 </html>

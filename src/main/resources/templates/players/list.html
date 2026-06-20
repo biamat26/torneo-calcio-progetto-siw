@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Squadre</title>
+    <title>Giocatori</title>
     <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
@@ -33,46 +33,49 @@
 </nav>
 
 <div class="container">
+
     <div class="flex justify-between mb-2">
-        <h1 style="margin-bottom: 0;">Squadre</h1>
+        <h1 style="margin-bottom: 0;">Giocatori</h1>
         <span sec:authorize="hasAuthority('ADMIN')">
-            <a th:href="@{/admin/teams/new}" class="btn btn-primary">+ Nuova squadra</a>
+            <a th:href="@{/admin/players/new}" class="btn btn-primary">+ Nuovo giocatore</a>
         </span>
     </div>
 
-    <p th:if="${#lists.isEmpty(teams)}" class="text-muted">Nessuna squadra registrata.</p>
+    <p th:if="${#lists.isEmpty(players)}" class="text-muted">Nessun giocatore registrato.</p>
 
     <div class="tournament-card-grid">
-        <div th:each="team : ${teams}" class="tournament-card">
+        <div th:each="player : ${players}" class="tournament-card">
             <div class="tournament-card-img">
-                <img th:if="${team.logoUrl != null}" th:src="${team.logoUrl}"
+                <img th:if="${player.photoUrl != null}" th:src="${player.photoUrl}"
                      style="width: 100%; height: 100%; object-fit: contain; padding: 12px;" />
-                <span th:unless="${team.logoUrl != null}">👕</span>
+                <span th:unless="${player.photoUrl != null}">👤</span>
             </div>
             <div class="tournament-card-body">
                 <div class="tournament-card-title">
-                    <a th:href="@{/teams/{id}(id=${team.id})}" th:text="${team.name}"></a>
+                    <a th:href="@{/players/{id}(id=${player.id})}"
+                       th:text="${player.name} + ' ' + ${player.surname}"></a>
                 </div>
                 <div class="tournament-card-meta">
-                    <span th:text="${team.city}"></span>
-                    · Est. <span th:text="${team.foundationYear}"></span>
+                    <span class="badge" th:text="${player.role}"></span>
+                    <span th:if="${player.team != null}"
+                          class="text-muted" style="margin-left: 4px;"
+                          th:text="${player.team.name}"></span>
                 </div>
                 <div class="tournament-card-actions">
-                    <span sec:authorize ="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/teams/{id}/edit(id=${team.id})}"
+                    <span sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/players/{id}/edit(id=${player.id})}"
                            class="btn btn-sm btn-secondary">Modifica</a>
-                        <form th:action="@{/admin/teams/{id}/delete(id=${team.id})}"
+                        <form th:action="@{/admin/players/{id}/delete(id=${player.id})}"
                               method="POST" style="display: inline;">
                             <button type="submit" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Cancellare la squadra? Verranno eliminate anche le partite associate.')">
-                                Cancella
-                            </button>
+                                    onclick="return confirm('Eliminare il giocatore?')">Elimina</button>
                         </form>
                     </span>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
 </body>

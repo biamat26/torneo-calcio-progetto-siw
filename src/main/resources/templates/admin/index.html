@@ -1,20 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>
-        SiwMovie - Amministrazione
-    </title>
+    <title>Admin — Tornei Calcio</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
-<h1>Gestione</h1>
-<h2>(riservato agli amministratori)</h2>
-<div>
-    <a href="/admin/tournament/new">Add new tournament</a>
+
+<nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
+    <a th:href="@{/matches}">Partite</a>
+    <div class="nav-right">
+        <span class="nav-username" th:text="${userDetails?.username}"></span>
+        <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit" class="btn btn-sm">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Dashboard Admin</h1>
+    <p class="text-muted" style="margin-bottom: 2rem;">Area riservata agli amministratori.</p>
+
+    <div class="grid-3">
+
+        <div class="card">
+            <div class="section-label">Tornei</div>
+            <h3 style="margin-bottom: 0.5rem;">Gestione tornei</h3>
+            <p class="text-muted" style="margin-bottom: 1rem; font-size: 13px;">Crea, modifica e gestisci i tornei.</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a th:href="@{/admin/tournaments/new}" class="btn btn-primary btn-sm">+ Nuovo</a>
+                <a th:href="@{/tournaments}" class="btn btn-secondary btn-sm">Vedi tutti</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-label">Squadre</div>
+            <h3 style="margin-bottom: 0.5rem;">Gestione squadre</h3>
+            <p class="text-muted" style="margin-bottom: 1rem; font-size: 13px;">Inserisci e modifica le squadre.</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a th:href="@{/admin/teams/new}" class="btn btn-primary btn-sm">+ Nuova</a>
+                <a th:href="@{/teams}" class="btn btn-secondary btn-sm">Vedi tutte</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-label">Giocatori</div>
+            <h3 style="margin-bottom: 0.5rem;">Gestione giocatori</h3>
+            <p class="text-muted" style="margin-bottom: 1rem; font-size: 13px;">Inserisci e modifica i giocatori.</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a th:href="@{/admin/players/new}" class="btn btn-primary btn-sm">+ Nuovo</a>
+                <a th:href="@{/players}" class="btn btn-secondary btn-sm">Vedi tutti</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-label">Partite</div>
+            <h3 style="margin-bottom: 0.5rem;">Gestione partite</h3>
+            <p class="text-muted" style="margin-bottom: 1rem; font-size: 13px;">Registra partite e inserisci risultati.</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a th:href="@{/admin/matches/new}" class="btn btn-primary btn-sm">+ Nuova</a>
+                <a th:href="@{/matches}" class="btn btn-secondary btn-sm">Vedi tutte</a>
+            </div>
+        </div>
+
+    </div>
 </div>
-<div>
-    <form th:action="@{/logout}" method="POST">
-        <button type="submit">Logout</button>
-    </form>
-</div>
+
 </body>
 </html>

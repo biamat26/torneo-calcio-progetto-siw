@@ -1,6 +1,7 @@
 package it.uniroma3.siw.torneo_calcio.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 import java.util.Objects;
@@ -11,12 +12,15 @@ public class Referee {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank
     @Column(nullable = false)
     private String name;
 
+    @NotBlank
     @Column(nullable = false)
     private String surname;
 
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String referee_code;
 

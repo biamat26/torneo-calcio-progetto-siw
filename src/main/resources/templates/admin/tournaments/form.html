@@ -1,60 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Inserimento Torneo</title>
+    <title>Nuovo Torneo</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
+
 <nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
     <a th:href="@{/}">Home</a>
     <a th:href="@{/tournaments}">Tornei</a>
     <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
     <a th:href="@{/matches}">Partite</a>
-    <span th:if="${userDetails}">
-        <span th:text="${userDetails.username}"></span>
-        <span sec:authorize="hasAuthority('ADMIN')">
-            <a th:href="@{/admin/index}">Admin Dashboard</a>
-        </span>
+    <div class="nav-right">
+        <span class="nav-username" th:text="${userDetails?.username}"></span>
+        <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
         <form th:action="@{/logout}" method="POST">
-            <button type="submit">Logout</button>
+            <button type="submit" class="btn btn-sm">Logout</button>
         </form>
-    </span>
-    <span th:unless="${userDetails}">
-        <a th:href="@{/login}">Login</a>
-        <a th:href="@{/register}">Registrati</a>
-    </span>
+    </div>
 </nav>
 
-<h1>Aggiungi un torneo</h1>
+<div class="container" style="max-width: 600px;">
 
-<form th:action="@{/admin/tournaments}" method="POST" th:object="${tournament}"
-      enctype="multipart/form-data">
+    <a th:href="@{/tournaments}" class="text-muted" style="font-size: 12px;">← Torna ai tornei</a>
+    <h1 style="margin-top: 0.25rem;">Nuovo Torneo</h1>
 
-    <div>
-        <label>Nome:</label>
-        <input type="text" th:field="*{name}" />
-        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></span>
-    </div>
-    <div>
-        <label>Anno:</label>
-        <input type="text" th:field="*{year}" />
-        <span th:if="${#fields.hasErrors('year')}" th:errors="*{year}" style="color:red"></span>
-    </div>
-    <div>
-        <label>Descrizione:</label>
-        <input type="text" th:field="*{description}" />
-    </div>
-    <div>
-        <label>Immagine torneo:</label>
-        <input type="file" name="image" accept="image/*"/>
+    <div class="card">
+        <form th:action="@{/admin/tournaments}" method="POST"
+              th:object="${tournament}" enctype="multipart/form-data">
+            <div>
+                <label>Nome</label>
+                <input type="text" th:field="*{name}" placeholder="Es. Serie A 2026" />
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red;"></span>
+            </div>
+            <div>
+                <label>Anno</label>
+                <input type="text" th:field="*{year}" placeholder="Es. 2026" />
+                <span th:if="${#fields.hasErrors('year')}" th:errors="*{year}" style="color:red;"></span>
+            </div>
+            <div>
+                <label>Descrizione</label>
+                <textarea th:field="*{description}" placeholder="Descrivi il torneo..."></textarea>
+            </div>
+            <div>
+                <label>Immagine torneo</label>
+                <input type="file" name="image" accept="image/*" />
+            </div>
+            <p class="text-muted" style="font-size: 12px; margin-top: 0.5rem;">
+                Le squadre possono essere aggiunte dopo la creazione.
+            </p>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Crea torneo</button>
+                <a th:href="@{/tournaments}" class="btn btn-secondary">Annulla</a>
+            </div>
+        </form>
     </div>
 
-    <br/>
-    <button type="submit">Conferma</button>
-    <a th:href="@{/tournaments}">Annulla</a>
-</form>
-
-<p><em>Le squadre possono essere aggiunte dopo la creazione, dalla pagina di modifica del torneo.</em></p>
+</div>
 
 </body>
 </html>

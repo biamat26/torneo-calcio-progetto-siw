@@ -1,27 +1,58 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="it"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Modifica Commento</title>
+    <title>Modifica commento</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
+
 <nav>
+    <span class="nav-logo">⚽ Tornei Calcio</span>
     <a th:href="@{/}">Home</a>
     <a th:href="@{/tournaments}">Tornei</a>
+    <a th:href="@{/teams}">Squadre</a>
+    <a th:href="@{/players}">Giocatori</a>
+    <a th:href="@{/matches}">Partite</a>
+    <div class="nav-right">
+        <span th:if="${userDetails}">
+            <span class="nav-username" th:text="${userDetails.username}"></span>
+            <span sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
+            </span>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-sm">Logout</button>
+            </form>
+        </span>
+    </div>
 </nav>
 
-<h1>Modifica il tuo commento</h1>
+<div class="container" style="max-width: 600px;">
 
-<form th:action="@{/matches/{matchId}/comments/{commentId}/edit(matchId=${matchId}, commentId=${comment.id})}"
-      th:object="${comment}" method="POST">
-    <div>
-        <textarea th:field="*{text}" rows="4" cols="60"
-                  maxlength="1000"></textarea>
-        <span th:if="${#fields.hasErrors('text')}"
-              th:errors="*{text}" style="color:red"></span>
+    <a th:href="@{/matches/{id}(id=${matchId})}"
+       class="text-muted" style="font-size: 12px;">← Torna alla partita</a>
+
+    <h1 style="margin-top: 0.25rem;">Modifica commento</h1>
+
+    <div class="card">
+        <form th:action="@{/matches/{matchId}/comments/{commentId}/edit(matchId=${matchId}, commentId=${comment.id})}"
+              th:object="${comment}" method="POST">
+            <div>
+                <label>Il tuo commento</label>
+                <textarea th:field="*{text}" rows="5" maxlength="1000"
+                          placeholder="Scrivi il tuo commento..."></textarea>
+                <span th:if="${#fields.hasErrors('text')}"
+                      th:errors="*{text}" style="color: red;"></span>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Salva</button>
+                <a th:href="@{/matches/{id}(id=${matchId})}" class="btn btn-secondary">Annulla</a>
+            </div>
+        </form>
     </div>
-    <br/>
-    <button type="submit">Salva</button>
-    <a th:href="@{/matches/{id}(id=${matchId})}">Annulla</a>
-</form>
+
+</div>
+
 </body>
 </html>
