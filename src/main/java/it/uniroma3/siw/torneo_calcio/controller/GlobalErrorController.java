@@ -22,24 +22,6 @@ import org.springframework.web.servlet.NoHandlerFoundException;
  */
 @ControllerAdvice
 public class GlobalErrorController {
-
-    /**
-     * Rende disponibile l'utente autenticato in tutti i template Thymeleaf
-     * tramite la variabile {@code userDetails}. Restituisce null se l'utente
-     * non è autenticato (accesso anonimo).
-     *
-     * @return l'oggetto {@link UserDetails} dell'utente autenticato, o null
-     */
-    @ModelAttribute("userDetails")
-    public UserDetails getUser() {
-        UserDetails user = null;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        }
-        return user;
-    }
-
     /**
      * Gestisce gli errori 404 — risorsa non trovata.
      * Viene invocato quando nessun controller corrisponde all'URL richiesto.

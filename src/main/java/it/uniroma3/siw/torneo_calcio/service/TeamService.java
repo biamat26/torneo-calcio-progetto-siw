@@ -38,6 +38,7 @@ public class TeamService {
         return teamRepository.save(team);
     }
 
+    @Transactional
     public void update(Team dati, Team esistente) {
         esistente.setName(dati.getName());
         esistente.setCity(dati.getCity());

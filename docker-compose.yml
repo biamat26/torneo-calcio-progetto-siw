@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+
+  # ── Database PostgreSQL ──────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine          # immagine ufficiale PostgreSQL
+    container_name: torneo-db
+    environment:
+      POSTGRES_DB: torneo_calcio
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"                    # 5433 sul tuo PC → 5432 nel container
+      # (5433 per non conflitto con Postgres locale)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # i dati persistono tra restart
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Applicazione Spring Boot ─────────────────────────────────────────────────
+  app:
+    build: .                           # costruisce l'immagine dal Dockerfile
+    container_name: torneo-app
+    depends_on:
+      db:
+        condition: service_healthy     # aspetta che il DB sia pronto
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/torneo_calcio
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SQL_INIT_MODE: always            # popola il DB con data.sql al primo avvio
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
