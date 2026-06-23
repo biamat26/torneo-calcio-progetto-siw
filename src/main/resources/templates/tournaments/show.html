@@ -61,9 +61,9 @@
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                     <a th:href="@{/tournaments/{id}/fixtures(id=${tournament.id})}" class="btn btn-sm btn-secondary">Calendario</a>
                     <a th:href="@{/tournaments/{id}/standings(id=${tournament.id})}" class="btn btn-sm btn-primary">Classifica</a>
-                    <sec:authorize access="hasAuthority('ADMIN')">
+                    <span sec:authorize="hasAuthority('ADMIN')">
                         <a th:href="@{/admin/tournaments/{id}/edit(id=${tournament.id})}" class="btn btn-sm btn-secondary">Modifica</a>
-                    </sec:authorize>
+                    </span>
                 </div>
             </div>
         </div>
