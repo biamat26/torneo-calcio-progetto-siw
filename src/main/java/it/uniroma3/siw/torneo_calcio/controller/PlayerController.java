@@ -32,8 +32,7 @@ public class PlayerController {
     }
 
     @GetMapping("/players")
-    public String list(Model model) {
-        model.addAttribute("players", playerService.findAll());
+    public String list() {
         return "players/list";
     }
 

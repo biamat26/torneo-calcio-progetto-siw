@@ -3,8 +3,12 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+    <meta charset="UTF-8">
     <title>Giocatori</title>
     <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
 </head>
 <body>
 
@@ -21,7 +25,7 @@
             <span sec:authorize="hasAuthority('ADMIN')">
                 <a th:href="@{/admin/index}" class="btn btn-sm btn-secondary">Admin</a>
             </span>
-            <form th:action="@{/logout}" method="POST">
+            <form th:action="@{/logout}" method="POST" style="display:inline;">
                 <button type="submit" class="btn btn-sm">Logout</button>
             </form>
         </span>
@@ -33,50 +37,126 @@
 </nav>
 
 <div class="container">
-
     <div class="flex justify-between mb-2">
         <h1 style="margin-bottom: 0;">Giocatori</h1>
         <span sec:authorize="hasAuthority('ADMIN')">
             <a th:href="@{/admin/players/new}" class="btn btn-primary">+ Nuovo giocatore</a>
         </span>
     </div>
-
-    <p th:if="${#lists.isEmpty(players)}" class="text-muted">Nessun giocatore registrato.</p>
-
-    <div class="tournament-card-grid">
-        <div th:each="player : ${players}" class="tournament-card">
-            <div class="tournament-card-img">
-                <img th:if="${player.photoUrl != null}" th:src="${player.photoUrl}"
-                     style="width: 100%; height: 100%; object-fit: contain; padding: 12px;" />
-                <span th:unless="${player.photoUrl != null}">👤</span>
-            </div>
-            <div class="tournament-card-body">
-                <div class="tournament-card-title">
-                    <a th:href="@{/players/{id}(id=${player.id})}"
-                       th:text="${player.name} + ' ' + ${player.surname}"></a>
-                </div>
-                <div class="tournament-card-meta">
-                    <span class="badge" th:text="${player.role}"></span>
-                    <span th:if="${player.team != null}"
-                          class="text-muted" style="margin-left: 4px;"
-                          th:text="${player.team.name}"></span>
-                </div>
-                <div class="tournament-card-actions">
-                    <span sec:authorize="hasAuthority('ADMIN')">
-                        <a th:href="@{/admin/players/{id}/edit(id=${player.id})}"
-                           class="btn btn-sm btn-secondary">Modifica</a>
-                        <form th:action="@{/admin/players/{id}/delete(id=${player.id})}"
-                              method="POST" style="display: inline;">
-                            <button type="submit" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Eliminare il giocatore?')">Elimina</button>
-                        </form>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <div id="root"></div>
 </div>
+
+<script type="text/babel" data-presets="react" th:inline="none">
+    const { useState, useEffect } = React;
+
+    const ROLES = ['GOALKEEPER', 'DEFENDER', 'MIDFIELDER', 'STRIKER'];
+
+    const ROLE_LABELS = {
+        GOALKEEPER: 'Portiere',
+        DEFENDER:   'Difensore',
+        MIDFIELDER: 'Centrocampista',
+        STRIKER:    'Attaccante',
+    };
+
+    function PlayerCard({ player }) {
+        const playerUrl = '/players/' + player.id;
+        const altText = (player.name || '') + ' ' + (player.surname || '');
+
+        return (
+            <div className='tournament-card'>
+                <div className='tournament-card-img'>
+                    {player.photoUrl
+                        ? <img src={player.photoUrl} alt={altText} />
+                        : <span>👤</span>
+                    }
+                </div>
+                <div className='tournament-card-body'>
+                    <div className='tournament-card-title'>
+                        <a href={playerUrl}>{player.name} {player.surname}</a>
+                    </div>
+                    <div className='tournament-card-meta'>
+                        <span className='badge'>{ROLE_LABELS[player.role] || player.role}</span>
+                        {player.teamName
+                            ? <span className='text-muted'>{player.teamName}</span>
+                            : null
+                        }
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    function PlayerList() {
+        const [players, setPlayers] = useState([]);
+        const [loading, setLoading] = useState(true);
+        const [error,   setError]   = useState(null);
+        const [search,  setSearch]  = useState('');
+        const [role,    setRole]    = useState('');
+
+        useEffect(function() {
+            fetch('/api/players')
+                .then(function(res) {
+                    if (!res.ok) throw new Error('Errore nel caricamento dei giocatori');
+                    return res.json();
+                })
+                .then(function(data) {
+                    setPlayers(Array.isArray(data) ? data : []);
+                    setLoading(false);
+                })
+                .catch(function(err) {
+                    setError(err.message);
+                    setLoading(false);
+                });
+        }, []);
+
+        if (loading) return <p className='text-muted'>Caricamento giocatori...</p>;
+        if (error)   return <p className='text-muted'>{error}</p>;
+
+        const filtered = players.filter(function(p) {
+            const matchesSearch = ((p.name || '') + ' ' + (p.surname || ''))
+                .toLowerCase()
+                .includes(search.toLowerCase());
+            const matchesRole = role === '' || p.role === role;
+            return matchesSearch && matchesRole;
+        });
+
+        return (
+            <div>
+                <div className='flex mb-2'>
+                    <input
+                        className='player-search'
+                        type='text'
+                        placeholder='Cerca per nome...'
+                        value={search}
+                        onChange={function(e) { setSearch(e.target.value); }}
+                    />
+                    <select
+                        className='player-role-select'
+                        value={role}
+                        onChange={function(e) { setRole(e.target.value); }}
+                    >
+                        <option value=''>Tutti i ruoli</option>
+                        {ROLES.map(function(r) {
+                            return <option key={r} value={r}>{ROLE_LABELS[r]}</option>;
+                        })}
+                    </select>
+                    <span className='text-muted'>{filtered.length} giocatori trovati</span>
+                </div>
+
+                {filtered.length === 0
+                    ? <p className='text-muted'>Nessun giocatore trovato.</p>
+                    : <div className='tournament-card-grid'>
+                        {filtered.map(function(p) {
+                            return <PlayerCard key={p.id} player={p} />;
+                        })}
+                    </div>
+                }
+            </div>
+        );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<PlayerList />);
+</script>
 
 </body>
 </html>

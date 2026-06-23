@@ -2,7 +2,7 @@ package it.uniroma3.siw.torneo_calcio.controller;
 
 import it.uniroma3.siw.torneo_calcio.service.TournamentService;
 import it.uniroma3.siw.torneo_calcio.standings.StandingRow;
-import it.uniroma3.siw.torneo_calcio.standings.StandingRowDTO;
+import it.uniroma3.siw.torneo_calcio.dto.StandingRowDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

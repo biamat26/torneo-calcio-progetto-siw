@@ -1,4 +1,6 @@
-package it.uniroma3.siw.torneo_calcio.standings;
+package it.uniroma3.siw.torneo_calcio.dto;
+
+import it.uniroma3.siw.torneo_calcio.standings.StandingRow;
 
 /**
  * DTO (Data Transfer Object) per la classifica del torneo.
