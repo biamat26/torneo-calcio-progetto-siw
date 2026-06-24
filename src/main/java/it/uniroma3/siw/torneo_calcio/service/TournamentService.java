@@ -65,8 +65,15 @@ public class TournamentService {
 
     @Transactional(readOnly = true)
     public List<StandingRow> getStandings(Long tournamentId){
-        List<Match> matches = matchRepository.findByTournament_IdAndState(tournamentId, MatchStatus.PLAYED);
+        // Inizializza la tabella con TUTTE le squadre del torneo — anche quelle senza partite
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
         Map<Team, StandingRow> table = new HashMap<>();
+        for (Team team : tournament.getTeams()) {
+            table.put(team, new StandingRow(team));
+        }
+
+        // Aggiunge i risultati delle partite giocate
+        List<Match> matches = matchRepository.findByTournament_IdAndState(tournamentId, MatchStatus.PLAYED);
         for(Match match : matches){
             Team homeTeam = match.getHomeTeam();
             Team awayTeam = match.getAwayTeam();
@@ -75,7 +82,8 @@ public class TournamentService {
             table.get(homeTeam).addMatch(match.getGoalsHome(), match.getGoalsAway());
             table.get(awayTeam).addMatch(match.getGoalsAway(), match.getGoalsHome());
         }
-        List<StandingRow> standings = new ArrayList<StandingRow>(table.values());
+
+        List<StandingRow> standings = new ArrayList<>(table.values());
         standings.sort(new StandingRowComparator());
         return standings;
     }
