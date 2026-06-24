@@ -40,7 +40,7 @@
                class="text-muted" style="font-size: 12px;">← Torna al torneo</a>
             <h1 style="margin-top: 0.25rem;" th:text="'Calendario — ' + ${tournament.name}"></h1>
         </div>
-        <span authorize="hasAuthority('ADMIN')">
+        <span sec:authorize="hasAuthority('ADMIN')">
             <a th:href="@{/admin/matches/new}" class="btn btn-primary">+ Nuova partita</a>
         </span>
     </div>
