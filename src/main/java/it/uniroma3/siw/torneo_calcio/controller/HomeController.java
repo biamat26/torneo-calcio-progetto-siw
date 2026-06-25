@@ -22,6 +22,7 @@ public class HomeController {
         model.addAttribute("lastResults", matchService.getLastResults());
         model.addAttribute("tournaments", tournamentService.findAll());
         model.addAttribute("upcomingMatches", matchService.getUpcomingMatches());
+        model.addAttribute("numeroPartiteTot", tournamentService.numeroPartite());
         return "index";
     }
 }

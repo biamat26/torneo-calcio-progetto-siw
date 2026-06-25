@@ -2,6 +2,8 @@ package it.uniroma3.siw.torneo_calcio.service;
 
 import it.uniroma3.siw.torneo_calcio.model.Match;
 import it.uniroma3.siw.torneo_calcio.model.MatchStatus;
+import it.uniroma3.siw.torneo_calcio.model.Team;
+import it.uniroma3.siw.torneo_calcio.model.Tournament;
 import it.uniroma3.siw.torneo_calcio.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,11 @@ public class MatchService {
         return matchRepository.findAll();
     }
 
+
+    @Transactional
+    public long count(){
+        return this.matchRepository.count();
+    }
 
     @Transactional(readOnly = true)
     public Optional<Match> findById(Long id){
@@ -52,5 +59,17 @@ public class MatchService {
     @Transactional
     public void delete(Long id){
         this.matchRepository.findById(id).ifPresent(matchRepository::delete);
+    }
+
+    public List<Match> findByTournament_IdAndState(Long tournamentId, MatchStatus matchStatus) {
+        return this.matchRepository.findByTournament_IdAndState(tournamentId, matchStatus);
+    }
+
+    public void deleteAll(List<Match> toDelete) {
+        this.matchRepository.deleteAll();
+    }
+
+    public List<Match> findScheduledByTournamentAndTeam(Tournament tournament, MatchStatus matchStatus, Team team) {
+        return this.matchRepository.findScheduledByTournamentAndTeam(tournament, matchStatus, team);
     }
 }

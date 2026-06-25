@@ -19,11 +19,12 @@ import java.util.*;
 public class TournamentService {
 
     private final TournamentRepository tournamentRepository;
-    private final MatchRepository matchRepository;
+    private final MatchService matchService;
 
-    public TournamentService(TournamentRepository tournamentRepository, MatchRepository matchRepository){
+
+    public TournamentService(TournamentRepository tournamentRepository, MatchService matchRepository){
         this.tournamentRepository = tournamentRepository;
-        this.matchRepository = matchRepository;
+        this.matchService = matchRepository;
     }
 
     @Transactional(readOnly  = true)
@@ -62,6 +63,10 @@ public class TournamentService {
         return result;
     }
 
+    @Transactional
+    public long numeroPartite(){
+        return this.matchService.count();
+    }
 
     @Transactional(readOnly = true)
     public List<StandingRow> getStandings(Long tournamentId){
@@ -73,7 +78,7 @@ public class TournamentService {
         }
 
         // Aggiunge i risultati delle partite giocate
-        List<Match> matches = matchRepository.findByTournament_IdAndState(tournamentId, MatchStatus.PLAYED);
+        List<Match> matches = matchService.findByTournament_IdAndState(tournamentId, MatchStatus.PLAYED);
         for(Match match : matches){
             Team homeTeam = match.getHomeTeam();
             Team awayTeam = match.getAwayTeam();
@@ -90,12 +95,12 @@ public class TournamentService {
 
     @Transactional(readOnly = true)
     public List<Match> getFixtures(Long tournamentId){
-        return matchRepository.findByTournament_IdAndState(tournamentId, MatchStatus.SCHEDULED);
+        return matchService.findByTournament_IdAndState(tournamentId, MatchStatus.SCHEDULED);
     }
 
     @Transactional(readOnly = true)
     public List<Match> getResults(Long tournamentId){
-        return matchRepository.findByTournament_IdAndState(tournamentId, MatchStatus.PLAYED);
+        return matchService.findByTournament_IdAndState(tournamentId, MatchStatus.PLAYED);
     }
 
     @Transactional
@@ -122,15 +127,14 @@ public class TournamentService {
     @Transactional
     public void removeTeamFromTournament(Tournament tournament, Team team) {
         // Cancella le partite SCHEDULED che coinvolgono la squadra in questo torneo
-        List<Match> toDelete = matchRepository.findScheduledByTournamentAndTeam(
+        List<Match> toDelete = matchService.findScheduledByTournamentAndTeam(
                 tournament, MatchStatus.SCHEDULED, team);
-        matchRepository.deleteAll(toDelete);
+        matchService.deleteAll(toDelete);
 
         // Rimuove la squadra dal torneo
         tournament.getTeams().remove(team);
         tournamentRepository.save(tournament);
     }
-
 }
 
 
